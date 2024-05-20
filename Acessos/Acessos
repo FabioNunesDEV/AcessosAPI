@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Acessos</name>
+    </assembly>
+    <members>
+        <member name="M:Acessos.Controllers.DocumentosController.RetornarDocumentos">
+            <summary>
+            Este método retorna todos os documentos.
+            </summary>
+            <response code="200">Retorna os documentos com sucesso</response>
+            <response code="500">Se houver um erro interno no servidor</response>
+        </member>
+    </members>
+</doc>
