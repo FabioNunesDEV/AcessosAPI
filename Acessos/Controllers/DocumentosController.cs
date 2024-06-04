@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Acessos.Data;
+using Acessos.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Acessos.Controllers;
 
@@ -6,6 +8,15 @@ namespace Acessos.Controllers;
 [Route("api/v1/documentos")]
 public class DocumentosController : ControllerBase
 {
+    CircularData _circularData;
+    List<Circular> _circulares;
+
+    public DocumentosController()
+    {
+        _circularData = new CircularData();
+        _circulares = _circularData.GetDadosCirculares();
+    }
+
     /// <summary>
     /// Retorna coleção com todos os documentos cadastrados.
     /// </summary>
@@ -28,11 +39,12 @@ public class DocumentosController : ControllerBase
     [HttpGet ("{documentoId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult Todos(int id)
+    public IActionResult PorId([FromRoute]int documentoId)
     {
-        throw new ApplicationException("Método não concluido");
-    }
+        Circular circular = _circulares.FirstOrDefault(c => c.Id == documentoId);
 
+        return Ok(circular);
+    }
 
     /// <summary>
     /// Inseri um novo documento.
