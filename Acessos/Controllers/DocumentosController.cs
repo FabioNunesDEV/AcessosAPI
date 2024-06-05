@@ -18,32 +18,35 @@ public class DocumentosController : ControllerBase
     }
 
     /// <summary>
-    /// Retorna coleção com todos os documentos cadastrados.
-    /// </summary>
-    /// <response code="200">Retorna os documentos com sucesso</response>
-    /// <response code="500">Se houver um erro interno no servidor</response>
-    [HttpGet ("todos")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult RetornarDocumentos()
-    {
-        throw new ApplicationException("Método não concluido");
-    }
-
-    /// <summary>
     /// Retorna um documento específico por ID.
     /// </summary>
     /// <param name="documentoId">Id do documento</param>
     /// <response code="200">Retorna o documento com sucesso</response>
     /// <response code="500">Se houver um erro interno no servidor</response>
-    [HttpGet ("{documentoId}")]
+    [HttpGet("{documentoId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult PorId([FromRoute]int documentoId)
+    public IActionResult RetornarDocumentoPorId([FromRoute] int documentoId)
     {
         Circular circular = _circulares.FirstOrDefault(c => c.Id == documentoId);
 
         return Ok(circular);
+    }
+
+
+    /// <summary>
+    /// Retorna coleção com todos os documentos cadastrados.
+    /// </summary>
+    /// <response code="200">Retorna os documentos com sucesso</response>
+    /// <response code="500">Se houver um erro interno no servidor</response>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public IActionResult RetornarTodosDocumentos()
+    {
+        List<Circular> circulares = _circulares;
+
+        return Ok(circulares);
     }
 
     /// <summary>
@@ -54,9 +57,14 @@ public class DocumentosController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult Criar()
+    public IActionResult InserirDocumento([FromBody] Circular circular)
     {
-        throw new ApplicationException("Método não concluido");
+        int id = _circularData.IncrementarId();
+        circular.Id = id;
+
+        _circulares.Add(circular);
+
+        return Ok(circular);
     }
 
     /// <summary>

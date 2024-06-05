@@ -5,12 +5,23 @@ namespace Acessos.Data;
 
 public class CircularData
 {
+    static int _Id = 0;
+    List<Circular> _circulares;
+
+    public CircularData()
+    {
+        _Id = 0;
+        _circulares = new List<Circular>();
+    }
+
+    /// <summary>
+    /// Cria uma lista de objetos Circular.
+    /// </summary>
+    /// <returns>Retorna lista de objetos Circular</returns>
     public List<Circular> GetDadosCirculares()
     {
-        List<Circular> circulares = new List<Circular>();
-        CircularService circularService = new CircularService();
 
-        circulares.Add(new Circular
+        _circulares.Add(new Circular
         {
             Id = 1,
             Protocolo = "f8c8e3a1-9b4d-4f6b-8e2a-7a5d6b9c2e0d",
@@ -23,7 +34,7 @@ public class CircularData
             Status = "Lido"
         });
 
-        circulares.Add(new Circular
+        _circulares.Add(new Circular
         {
             Id = 2,
             Protocolo = "b5a7f8d2-3e9c-4a1a-8e6b-9f0d7c6e2b4f",
@@ -36,9 +47,9 @@ public class CircularData
             Status = "Não lido"
         });
 
-        circulares.Add(new Circular
+        _circulares.Add(new Circular
         {
-            Id = 2,
+            Id = 3,
             Protocolo = "e1d9b0c3-8a6f-4c7e-9b2d-5f8a7b6c3d9e",
             Assunto = "Registro em carteira",
             Conteudo = "Prezado RH, informamos que as carteiras de trabalho serão preenchidas após 90 dias de experiência do candidato. Agradecemos a compreensão e colaboração de todos!",
@@ -49,6 +60,20 @@ public class CircularData
             Status = "Lido"
         });
 
-        return circulares;
+
+
+        return _circulares;
     } 
+
+    /// <summary>
+    /// Incre
+    /// </summary>
+    /// <returns>Retornar numero de Id</returns>
+    public int IncrementarId()
+    {
+        // Registra o valor do ultimo id para simular incrementação quando necessário.
+        _Id = _circulares[_circulares.Count - 1].Id;
+
+        return ++_Id;
+    }
 }
