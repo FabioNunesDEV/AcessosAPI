@@ -8,13 +8,10 @@ namespace Acessos.Controllers;
 [Route("api/v1/documentos")]
 public class DocumentosController : ControllerBase
 {
-    CircularData _circularData;
-    List<Circular> _circulares;
 
     public DocumentosController()
     {
-        _circularData = new CircularData();
-        _circulares = _circularData.GetDadosCirculares();
+
     }
 
     /// <summary>
@@ -28,11 +25,10 @@ public class DocumentosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult RetornarDocumentoPorId([FromRoute] int documentoId)
     {
-        Circular circular = _circulares.FirstOrDefault(c => c.Id == documentoId);
+        Circular circular = CircularData.circulares.FirstOrDefault(c => c.Id == documentoId);
 
         return Ok(circular);
     }
-
 
     /// <summary>
     /// Retorna coleção com todos os documentos cadastrados.
@@ -43,10 +39,8 @@ public class DocumentosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult RetornarTodosDocumentos()
-    {
-        List<Circular> circulares = _circulares;
-
-        return Ok(circulares);
+    {  
+        return Ok(CircularData.circulares);
     }
 
     /// <summary>
@@ -59,10 +53,10 @@ public class DocumentosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult InserirDocumento([FromBody] Circular circular)
     {
-        int id = _circularData.IncrementarId();
+        int id = CircularData.IncrementarId();
         circular.Id = id;
 
-        _circulares.Add(circular);
+        CircularData.circulares.Add(circular);
 
         return Ok(circular);
     }

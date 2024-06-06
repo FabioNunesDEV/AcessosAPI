@@ -3,25 +3,12 @@ using Acessos.Services;
 
 namespace Acessos.Data;
 
-public class CircularData
+public static class CircularData
 {
     static int _Id = 0;
-    List<Circular> _circulares;
 
-    public CircularData()
-    {
-        _Id = 0;
-        _circulares = new List<Circular>();
-    }
-
-    /// <summary>
-    /// Cria uma lista de objetos Circular.
-    /// </summary>
-    /// <returns>Retorna lista de objetos Circular</returns>
-    public List<Circular> GetDadosCirculares()
-    {
-
-        _circulares.Add(new Circular
+    public static List<Circular> circulares = new List<Circular>() {
+        new Circular
         {
             Id = 1,
             Protocolo = "f8c8e3a1-9b4d-4f6b-8e2a-7a5d6b9c2e0d",
@@ -32,9 +19,8 @@ public class CircularData
             DataEnvio = new DateTime(2024, 05,27,8,0,0),
             DataRecebimento = new DateTime(2024,05,27,12,0,0),
             Status = "Lido"
-        });
-
-        _circulares.Add(new Circular
+        },
+        new Circular
         {
             Id = 2,
             Protocolo = "b5a7f8d2-3e9c-4a1a-8e6b-9f0d7c6e2b4f",
@@ -45,9 +31,8 @@ public class CircularData
             DataEnvio = new DateTime(2024, 06, 04, 8, 0, 0),
             DataRecebimento = null,
             Status = "Não lido"
-        });
-
-        _circulares.Add(new Circular
+        },
+        new Circular
         {
             Id = 3,
             Protocolo = "e1d9b0c3-8a6f-4c7e-9b2d-5f8a7b6c3d9e",
@@ -58,22 +43,18 @@ public class CircularData
             DataEnvio = new DateTime(2024, 05, 27, 15, 30, 0),
             DataRecebimento = new DateTime(2024, 06, 04, 8, 0, 0),
             Status = "Lido"
-        });
-
-
-
-        return _circulares;
-    } 
+        }
+    };
 
     /// <summary>
     /// Incre
     /// </summary>
     /// <returns>Retornar numero de Id</returns>
-    public int IncrementarId()
+    public static int IncrementarId()
     {
         // Registra o valor do ultimo id para simular incrementação quando necessário.
-        _Id = _circulares[_circulares.Count - 1].Id;
+        _Id = circulares[circulares.Count - 1].Id + 1;
 
-        return ++_Id;
+        return _Id;
     }
 }
