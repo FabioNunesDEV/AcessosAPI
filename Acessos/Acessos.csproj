@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
@@ -15,6 +16,7 @@
     <Folder Include="Data\" />
     <Folder Include="Dto\" />
     <Folder Include="Profiles\" />
+    <Folder Include="Swagger\" />
   </ItemGroup>
 
 </Project>
