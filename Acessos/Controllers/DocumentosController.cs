@@ -144,12 +144,11 @@ public class DocumentosController : ControllerBase
     /// <response code="404">Caso nenhum documento for encontrado</response>
     /// <response code="500">Se houver um erro interno no servidor</response>
     [HttpPatch("documento/{id}")]
-
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult AlterarParcial([FromRoute] int id, [FromBody] JsonPatchDocument<Circular> patchDoc)
+    public IActionResult AlterarParcial(int id, JsonPatchDocument<Circular> patchDoc)
     {
         if (id <= 0) return BadRequest("O Id do documento deve ser maior que zero.");
 
@@ -157,7 +156,7 @@ public class DocumentosController : ControllerBase
 
         if (circularOld == null) return NotFound("Documento não encontrado.");
 
-        patchDoc.ApplyTo(circularOld);
+        patchDoc.ApplyTo(circularOld, ModelState);
 
         if (!ModelState.IsValid)
         {
@@ -166,8 +165,6 @@ public class DocumentosController : ControllerBase
 
         return Ok(circularOld);
     }
-
-
 
     /// <summary>
     /// Deleta um documento específico por Id.
