@@ -2,12 +2,22 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System;
 using Acessos.Services;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Acessos.Data;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers().AddNewtonsoftJson(); ;
+builder.Services.AddControllers().AddNewtonsoftJson(); 
+
+// Add Automapper a aplicação
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Definido conexão com o banco de dados
+var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
+builder.Services.AddDbContext<AcessoApiContext>(opts => opts.UseSqlServer(connectionString));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<CircularService>();
