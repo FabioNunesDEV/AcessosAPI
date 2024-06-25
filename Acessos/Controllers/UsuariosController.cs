@@ -22,12 +22,11 @@ public class UsuariosController: ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// Cria um novo registro na tabela Usuario.
     /// </summary>
-    /// <param name="usuarioDTO"></param>
-    /// <returns></returns>
+    /// <param name="usuarioDTO">Objeto DTO com informações do usuário</param>
     [HttpPost]
-    public IActionResult Adicionar([FromBody] UsuarioCreateDTO usuarioDTO)
+    public IActionResult Criar([FromBody] UsuarioCreateDTO usuarioDTO)
     {
         Usuario usuario = _mapper.Map<Usuario>(usuarioDTO);
         _context.Usuarios.Add(usuario);
@@ -36,10 +35,9 @@ public class UsuariosController: ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// Recuperar informação de usuário pelo seu id
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">Id do usuário.</param>
     [HttpGet("usuario/{id}")]
     public IActionResult RecuperarPorId(int id) 
     {
@@ -50,29 +48,32 @@ public class UsuariosController: ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// Recupera uma listagem de usuários paginada.
     /// </summary>
-    /// <returns></returns>
-    [HttpGet("lista")]
-    public IEnumerable<UsuarioReadDTO> RecuperarLista()
+    /// <param name="skip">Posição inicial</param>
+    /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
+    /// <returns>Retorna uma coleção de documentos</returns>
+    [HttpGet("lista/skip/{skip}/take/{take}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IEnumerable<UsuarioReadDTO> RecuperarLista([FromRoute] int skip = 0, [FromRoute] int take = 10)
     {
-        return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios);
+        return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios.Skip(skip).Take(take));
     }
 
     /// <summary>
-    /// 
+    /// Atualiza registro de usuario.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="usuarioDTO"></param>
+    /// <param name="id">Id do usuário</param>
+    /// <param name="usuario"></param>
     /// <returns></returns>
     [HttpPut("usuario/{id}")]
-    public IActionResult Atualizar(int id, [FromBody] UsuarioUpdateDTO usuarioDTO)
+    public IActionResult Atualizar(int id, [FromBody] UsuarioUpdateDTO usuario)
     {
-        var usuario = _context.Usuarios.FirstOrDefault(usuario=>usuario.Id == id);
+        var usuarioOld = _context.Usuarios.FirstOrDefault(usuario=>usuario.Id == id);
 
-        if (usuario == null) return NotFound();
+        if (usuarioOld == null) return NotFound();
 
-        _mapper.Map(usuarioDTO, usuario);
+        _mapper.Map(usuario, usuarioOld);
         _context.SaveChanges();
 
         return NoContent();
