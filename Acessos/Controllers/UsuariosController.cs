@@ -5,6 +5,7 @@ using Acessos.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Acessos.Controllers;
 
@@ -26,21 +27,27 @@ public class UsuariosController: ControllerBase
     /// </summary>
     /// <param name="usuarioDTO">Objeto DTO com informações do usuário</param>
     [HttpPost]
+    [ProducesResponseType(typeof(Usuario), (int)HttpStatusCode.Created)]
     public IActionResult Criar([FromBody] UsuarioCreateDTO usuarioDTO)
     {
         Usuario usuario = _mapper.Map<Usuario>(usuarioDTO);
         _context.Usuarios.Add(usuario);
         _context.SaveChanges();
-        return CreatedAtAction(nameof(RecuperarPorId), new { id = usuario.Id }, usuario);
+        return CreatedAtAction(nameof(GetUsuarioPorId), new { id = usuario.Id }, usuario);
     }
 
     /// <summary>
     /// Recuperar informação de usuário pelo seu id
     /// </summary>
     /// <param name="id">Id do usuário.</param>
-    [HttpGet("usuario/{id}")]
-    public IActionResult RecuperarPorId(int id) 
+    [HttpGet("{id}")]
+    public IActionResult GetUsuarioPorId([FromRoute] int id)
     {
+        if (id <= 0)
+        {
+            return BadRequest("O Id deve ser um número maior que zero.");
+        }
+
         var usuario = _context.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
         if (usuario == null) return NotFound();
         var usuarioReadDTO = _mapper.Map<UsuarioReadDTO>(usuario);
@@ -53,9 +60,9 @@ public class UsuariosController: ControllerBase
     /// <param name="skip">Posição inicial</param>
     /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
     /// <returns>Retorna uma coleção de documentos</returns>
-    [HttpGet("lista/skip/{skip}/take/{take}")]
+    [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IEnumerable<UsuarioReadDTO> RecuperarLista([FromRoute] int skip = 0, [FromRoute] int take = 10)
+    public IEnumerable<UsuarioReadDTO> GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
         return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios.Skip(skip).Take(take));
     }
