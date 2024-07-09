@@ -257,6 +257,6 @@ public class DocumentosController : ControllerBase
 
         _circularService.circulares.Remove(circular);
 
-        return Ok(circular);
+        return NoContent();
     }
 }

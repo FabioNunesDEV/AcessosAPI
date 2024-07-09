@@ -28,7 +28,7 @@ public class UsuariosController: ControllerBase
     /// <param name="usuarioDTO">Objeto DTO com informações do usuário</param>
     [HttpPost]
     [ProducesResponseType(typeof(Usuario), (int)HttpStatusCode.Created)]
-    public IActionResult Criar([FromBody] UsuarioCreateDTO usuarioDTO)
+    public IActionResult PostUsuario([FromBody] UsuarioCreateDTO usuarioDTO)
     {
         Usuario usuario = _mapper.Map<Usuario>(usuarioDTO);
         _context.Usuarios.Add(usuario);
@@ -61,7 +61,6 @@ public class UsuariosController: ControllerBase
     /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
     /// <returns>Retorna uma coleção de documentos</returns>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     public IEnumerable<UsuarioReadDTO> GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
         return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios.Skip(skip).Take(take));
@@ -74,7 +73,7 @@ public class UsuariosController: ControllerBase
     /// <param name="usuario"></param>
     /// <returns></returns>
     [HttpPut("usuario/{id}")]
-    public IActionResult Atualizar(int id, [FromBody] UsuarioUpdateDTO usuario)
+    public IActionResult PutUsuario(int id, [FromBody] UsuarioUpdateDTO usuario)
     {
         var usuarioOld = _context.Usuarios.FirstOrDefault(usuario=>usuario.Id == id);
 
@@ -87,7 +86,7 @@ public class UsuariosController: ControllerBase
     }
 
     /// <summary>
-    /// 
+    /// Altera parcialmente as informações de um usuário informando seu id.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="patchDoc"></param>
@@ -103,7 +102,7 @@ public class UsuariosController: ControllerBase
     /// </remarks>
     /// <returns></returns>
     [HttpPatch("usuario/{id}")]
-    public IActionResult AtualizarParcial(int id, [FromBody] JsonPatchDocument<UsuarioUpdateDTO> patchDoc) 
+    public IActionResult PatchUsuario(int id, [FromBody] JsonPatchDocument<UsuarioUpdateDTO> patchDoc) 
     {
         var usuario = _context.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
 
@@ -123,6 +122,32 @@ public class UsuariosController: ControllerBase
         _context.SaveChanges();
 
         return NoContent();
-    }  
+    }
+
+    /// <summary>
+    /// Deleta um usuario específico por seu id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpDelete("usuatio/{id}")]
+    public IActionResult DeleteUsuario(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest("O Id do usuario deve ser maior que zero.");
+        }
+
+        Usuario usuario = _context.Usuarios.FirstOrDefault(c => c.Id == id);
+
+        if (usuario == null)
+        {
+            return NotFound("Ususario não encontrado.");
+        }
+
+        _context.Usuarios.Remove(usuario);
+        _context.SaveChanges();
+
+        return NoContent();
+    }
 
 }

@@ -11,5 +11,6 @@ public class AcessoApiContext : DbContext
     }
 
     public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<Grupo> Grupos { get; set; }
 
 }
