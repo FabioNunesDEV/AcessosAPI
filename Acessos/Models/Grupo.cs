@@ -13,4 +13,6 @@ public class Grupo
     [Required]
     [MaxLength(80)]
     public string Nome { get; set; }
+
+    public virtual ICollection<UsuarioGrupo> UsuarioGrupos { get; set; }
 }

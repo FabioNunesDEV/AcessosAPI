@@ -18,4 +18,6 @@ public class Usuario
     [MaxLength(80)]
     [EmailAddress]
     public string Email { get; set; }
+
+    public virtual ICollection<UsuarioGrupo> UsuarioGrupos { get; set; }
 }
