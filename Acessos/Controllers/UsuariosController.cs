@@ -71,7 +71,6 @@ public class UsuariosController: ControllerBase
     /// </summary>
     /// <param name="id">Id do usuário</param>
     /// <param name="usuario"></param>
-    /// <returns></returns>
     [HttpPut("usuario/{id}")]
     public IActionResult PutUsuario(int id, [FromBody] UsuarioUpdateDTO usuario)
     {
@@ -100,7 +99,6 @@ public class UsuariosController: ControllerBase
     ///     ]
     ///
     /// </remarks>
-    /// <returns></returns>
     [HttpPatch("usuario/{id}")]
     public IActionResult PatchUsuario(int id, [FromBody] JsonPatchDocument<UsuarioUpdateDTO> patchDoc) 
     {
@@ -128,7 +126,6 @@ public class UsuariosController: ControllerBase
     /// Deleta um usuario específico por seu id.
     /// </summary>
     /// <param name="id"></param>
-    /// <returns></returns>
     [HttpDelete("usuatio/{id}")]
     public IActionResult DeleteUsuario(int id)
     {
@@ -149,5 +146,48 @@ public class UsuariosController: ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Adiciona um novo relacionamento entre usuário e grupo.
+    /// </summary>
+    /// <param name="usuarioId">Id do usuário</param>
+    /// <param name="grupoId">Id do grupo</param>
+    [HttpPost("{usuarioId}/grupos/{grupoId}")]
+    public IActionResult PostUsuarioGrupo([FromRoute] int usuarioId, [FromRoute] int grupoId)
+    {
+        // Verifica se o usuário existe
+        var usuario = _context.Usuarios.FirstOrDefault(u => u.Id == usuarioId);
+        if (usuario == null)
+        {
+            return NotFound($"Usuário com ID {usuarioId} não encontrado.");
+        }
+
+        // Verifica se o grupo existe
+        var grupo = _context.Grupos.FirstOrDefault(g => g.Id == grupoId);
+        if (grupo == null)
+        {
+            return NotFound($"Grupo com ID {grupoId} não encontrado.");
+        }
+
+        // Verifica se o relacionamento já existe
+        var usuarioGrupoExistente = _context.UsuarioGrupos.FirstOrDefault(ug => ug.UsuarioId == usuarioId && ug.GrupoId == grupoId);
+        if (usuarioGrupoExistente != null)
+        {
+            return BadRequest("Este usuário já está associado a este grupo.");
+        }
+
+        // Cria o novo relacionamento
+        var usuarioGrupo = new UsuarioGrupo
+        {
+            UsuarioId = usuarioId,
+            GrupoId = grupoId
+        };
+
+        _context.UsuarioGrupos.Add(usuarioGrupo);
+        _context.SaveChanges();
+
+        return Ok();
+    }
+
 
 }
