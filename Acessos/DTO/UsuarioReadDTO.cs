@@ -8,5 +8,5 @@ public class UsuarioReadDTO
     public string Nome { get; set; }
     public string Email { get; set; }
 
-    public ICollection<UsuarioGrupo> usuarioGrupos { get; set; }
+    public ICollection<UsuarioGrupoReadDTO> usuarioGrupos { get; set; }
 }

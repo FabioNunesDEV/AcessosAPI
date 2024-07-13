@@ -10,7 +10,9 @@ public class UsuarioProfile : Profile
     {
         CreateMap<UsuarioCreateDTO,  Usuario>();
         CreateMap<UsuarioUpdateDTO, Usuario>();
-        CreateMap<Usuario, UsuarioReadDTO>();
+        CreateMap<Usuario, UsuarioReadDTO>()
+            .ForMember(UsurioDTO => UsurioDTO.usuarioGrupos, 
+                       opt => opt.MapFrom(Usuario => Usuario.UsuarioGrupos)); 
         CreateMap<Usuario, UsuarioUpdateDTO>();        
     }
 }

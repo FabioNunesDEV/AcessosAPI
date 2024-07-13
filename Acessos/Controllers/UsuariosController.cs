@@ -5,6 +5,7 @@ using Acessos.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace Acessos.Controllers;
@@ -48,7 +49,12 @@ public class UsuariosController: ControllerBase
             return BadRequest("O Id deve ser um número maior que zero.");
         }
 
-        var usuario = _context.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
+        // Modifique esta linha para incluir o carregamento adiantado das relações
+        var usuario = _context.Usuarios
+                      .Include(u => u.UsuarioGrupos)
+                      .ThenInclude(ug => ug.Grupo)
+                      .FirstOrDefault(u => u.Id == id);
+
         if (usuario == null) return NotFound();
         var usuarioReadDTO = _mapper.Map<UsuarioReadDTO>(usuario);
         return Ok(usuarioReadDTO);
