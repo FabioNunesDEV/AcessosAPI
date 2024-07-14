@@ -9,6 +9,7 @@ namespace Acessos.Profiles
         public UsuarioGrupoProfile()
         {
             CreateMap<UsuarioGrupoCreateDTO, UsuarioGrupo>();
+            CreateMap<UsuarioGrupo, UsuarioGrupoReadDTO>();
             CreateMap<UsuarioGrupo, UsuarioGrupoReadDTO>()
                  .ForMember(dest => dest.GrupoNome, opt => opt.MapFrom(src => src.Grupo.Nome)); 
         }

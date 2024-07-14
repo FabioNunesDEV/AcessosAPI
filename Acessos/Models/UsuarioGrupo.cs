@@ -6,7 +6,7 @@ namespace Acessos.Models;
 [Table("UsuarioGrupo")]
 public class UsuarioGrupo
 {
-    [Required]
+    [Required]    
     public int? UsuarioId { get; set; }
     public virtual Usuario Usuario { get; set; }
 

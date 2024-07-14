@@ -52,11 +52,11 @@ public class UsuariosController: ControllerBase
         // Modifique esta linha para incluir o carregamento adiantado das relações
         var usuario = _context.Usuarios
                       .Include(u => u.UsuarioGrupos)
-                      .ThenInclude(ug => ug.Grupo)
+                        .ThenInclude(ug => ug.Grupo)
                       .FirstOrDefault(u => u.Id == id);
 
         if (usuario == null) return NotFound();
-        var usuarioReadDTO = _mapper.Map<UsuarioReadDTO>(usuario);
+        var usuarioReadDTO = _mapper.Map<UsuarioReadComGruposDTO>(usuario);
         return Ok(usuarioReadDTO);
     }
 
@@ -69,7 +69,9 @@ public class UsuariosController: ControllerBase
     [HttpGet]
     public IEnumerable<UsuarioReadDTO> GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
-        return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios.Skip(skip).Take(take));
+        return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios 
+            .Skip(skip)
+            .Take(take));
     }
 
     /// <summary>
@@ -165,14 +167,14 @@ public class UsuariosController: ControllerBase
         var usuario = _context.Usuarios.FirstOrDefault(u => u.Id == usuarioId);
         if (usuario == null)
         {
-            return NotFound($"Usuário com ID {usuarioId} não encontrado.");
+            return NotFound($"Usuário com Id {usuarioId} não encontrado.");
         }
 
         // Verifica se o grupo existe
         var grupo = _context.Grupos.FirstOrDefault(g => g.Id == grupoId);
         if (grupo == null)
         {
-            return NotFound($"Grupo com ID {grupoId} não encontrado.");
+            return NotFound($"Grupo com Id {grupoId} não encontrado.");
         }
 
         // Verifica se o relacionamento já existe
@@ -195,5 +197,40 @@ public class UsuariosController: ControllerBase
         return Ok();
     }
 
+    [HttpDelete("{usuarioId}/grupos/{grupoId}")]
+    public IActionResult DeleteUsuarioGrupo([FromRoute] int usuarioId, [FromRoute] int grupoId)
+    {
+        // Verifica se o usuário existe
+        var usuario = _context.Usuarios.FirstOrDefault(u => u.Id == usuarioId);
+        if (usuario == null)
+        {
+            return NotFound($"Usuário com Id {usuarioId} não encontrado.");
+        }
 
+        // Verifica se o grupo existe
+        var grupo = _context.Grupos.FirstOrDefault(g => g.Id == grupoId);
+        if (grupo == null)
+        {
+            return NotFound($"Grupo com Id {grupoId} não encontrado.");
+        }
+
+        // Verifica se o relacionamento já existe
+        var usuarioGrupoExistente = _context.UsuarioGrupos.FirstOrDefault(ug => ug.UsuarioId == usuarioId && ug.GrupoId == grupoId);
+        if (usuarioGrupoExistente == null)
+        {
+            return BadRequest("Este usuário não está associado a este grupo.");
+        }
+
+        // Cria o novo relacionamento
+        var usuarioGrupo = new UsuarioGrupo
+        {
+            UsuarioId = usuarioId,
+            GrupoId = grupoId
+        };
+
+        _context.UsuarioGrupos.Remove(usuarioGrupo);
+        _context.SaveChanges();
+
+        return Ok();
+    }
 }

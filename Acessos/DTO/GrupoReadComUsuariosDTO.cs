@@ -1,11 +1,10 @@
 ﻿using Acessos.Models;
-using System.Text.Json.Serialization;
 
 namespace Acessos.DTO;
 
-public class UsuarioReadDTO
+public class GrupoReadDTO
 {
     public int Id { get; set; }
     public string Nome { get; set; }
-    public string Email { get; set; }
+    public ICollection<UsuarioGrupo> usuarioGrupos { get; set; }
 }
