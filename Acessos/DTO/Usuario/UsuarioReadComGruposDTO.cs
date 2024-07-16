@@ -1,7 +1,7 @@
 ﻿using Acessos.Models;
 using System.Text.Json.Serialization;
 
-namespace Acessos.DTO;
+namespace Acessos.DTO.usuario;
 
 public class UsuarioReadComGruposDTO
 {

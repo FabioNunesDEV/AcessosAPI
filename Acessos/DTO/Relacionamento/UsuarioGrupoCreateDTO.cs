@@ -1,4 +1,4 @@
-﻿namespace Acessos.DTO
+﻿namespace Acessos.DTO.Relacionamento
 {
     public class UsuarioGrupoCreateDTO
     {

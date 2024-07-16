@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Acessos.DTO;
+namespace Acessos.DTO.usuario;
 
 public class UsuarioUpdateDTO
 {

@@ -1,4 +1,4 @@
-﻿using Acessos.DTO;
+﻿using Acessos.DTO.Relacionamento;
 using Acessos.Models;
 using AutoMapper;
 
@@ -10,8 +10,6 @@ namespace Acessos.Profiles
         {
             CreateMap<UsuarioGrupoCreateDTO, UsuarioGrupo>();
             CreateMap<UsuarioGrupo, UsuarioGrupoReadDTO>();
-            CreateMap<UsuarioGrupo, UsuarioGrupoReadDTO>()
-                 .ForMember(dest => dest.GrupoNome, opt => opt.MapFrom(src => src.Grupo.Nome)); 
         }
     }
 }

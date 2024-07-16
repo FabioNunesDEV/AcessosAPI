@@ -1,5 +1,5 @@
 ﻿using Acessos.Data;
-using Acessos.DTO;
+using Acessos.DTO.Grupo;
 using Acessos.Models;
 using Acessos.Services;
 using AutoMapper;

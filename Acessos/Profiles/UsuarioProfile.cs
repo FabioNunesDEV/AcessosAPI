@@ -1,4 +1,4 @@
-﻿using Acessos.DTO;
+﻿using Acessos.DTO.usuario;
 using Acessos.Models;
 using AutoMapper;
 
@@ -10,9 +10,8 @@ public class UsuarioProfile : Profile
     {
         CreateMap<UsuarioCreateDTO,  Usuario>();
         CreateMap<UsuarioUpdateDTO, Usuario>();
-        CreateMap<Usuario, UsuarioReadDTO>();
-        CreateMap<Usuario, UsuarioReadComGruposDTO>()
-            .ForMember(UsuarioDTO => UsuarioDTO.Grupos, 
+        CreateMap<Usuario, UsuarioReadDTO>()
+            .ForMember(UsuarioDTO => UsuarioDTO.UsuarioGrupos, 
                        opt => opt.MapFrom(Usuario => Usuario.UsuarioGrupos)); 
         CreateMap<Usuario, UsuarioUpdateDTO>();        
     }

@@ -1,6 +1,6 @@
 ﻿using Acessos.Models;
 
-namespace Acessos.DTO;
+namespace Acessos.DTO.Grupo;
 
 public class GrupoReadDTO
 {

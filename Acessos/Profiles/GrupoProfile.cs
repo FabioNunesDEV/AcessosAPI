@@ -1,4 +1,4 @@
-﻿using Acessos.DTO;
+﻿using Acessos.DTO.Grupo;
 using Acessos.Models;
 using AutoMapper;
 

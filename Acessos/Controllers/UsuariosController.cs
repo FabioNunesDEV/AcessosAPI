@@ -1,5 +1,5 @@
 ﻿using Acessos.Data;
-using Acessos.DTO;
+using Acessos.DTO.usuario;
 using Acessos.Models;
 using Acessos.Services;
 using AutoMapper;
@@ -52,12 +52,12 @@ public class UsuariosController: ControllerBase
         // Modifique esta linha para incluir o carregamento adiantado das relações
         var usuario = _context.Usuarios
                       .Include(u => u.UsuarioGrupos)
-                        .ThenInclude(ug => ug.Grupo)
+                        .ThenInclude(ug => ug.Grupo)                       
                       .FirstOrDefault(u => u.Id == id);
 
         if (usuario == null) return NotFound();
-        var usuarioReadDTO = _mapper.Map<UsuarioReadComGruposDTO>(usuario);
-        return Ok(usuarioReadDTO);
+        var usuarioReadDTO = _mapper.Map<UsuarioReadDTO>(usuario);
+        return Ok(usuario);
     }
 
     /// <summary>
