@@ -56,8 +56,20 @@ public class UsuariosController: ControllerBase
                       .FirstOrDefault(u => u.Id == id);
 
         if (usuario == null) return NotFound();
-        var usuarioReadDTO = _mapper.Map<UsuarioReadDTO>(usuario);
-        return Ok(usuario);
+
+        var response = new
+        {
+            Id = usuario.Id,
+            Nome = usuario.Nome,
+            Email = usuario.Email,
+            Grupos = usuario.UsuarioGrupos.Select(ug => new
+            {
+                Id = ug.Grupo.Id,
+                Nome = ug.Grupo.Nome
+            }).ToList()
+        };
+
+        return Ok(response);
     }
 
     /// <summary>
@@ -67,11 +79,20 @@ public class UsuariosController: ControllerBase
     /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
     /// <returns>Retorna uma coleção de documentos</returns>
     [HttpGet]
-    public IEnumerable<UsuarioReadDTO> GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
+    public IActionResult GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
-        return _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios 
+        var usuarios = _context.Usuarios
             .Skip(skip)
-            .Take(take));
+            .Take(take)
+            .Select(u => new
+            {
+                Id = u.Id,
+                Nome = u.Nome,
+                Email = u.Email
+            })
+            .ToList();
+
+        return Ok(usuarios);
     }
 
     /// <summary>
@@ -221,14 +242,7 @@ public class UsuariosController: ControllerBase
             return BadRequest("Este usuário não está associado a este grupo.");
         }
 
-        // Cria o novo relacionamento
-        var usuarioGrupo = new UsuarioGrupo
-        {
-            UsuarioId = usuarioId,
-            GrupoId = grupoId
-        };
-
-        _context.UsuarioGrupos.Remove(usuarioGrupo);
+        _context.UsuarioGrupos.Remove(usuarioGrupoExistente);
         _context.SaveChanges();
 
         return Ok();
