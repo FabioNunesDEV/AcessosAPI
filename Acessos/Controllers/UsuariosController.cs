@@ -81,16 +81,8 @@ public class UsuariosController: ControllerBase
     [HttpGet]
     public IActionResult GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
-        var usuarios = _context.Usuarios
-            .Skip(skip)
-            .Take(take)
-            .Select(u => new
-            {
-                Id = u.Id,
-                Nome = u.Nome,
-                Email = u.Email
-            })
-            .ToList();
+
+        var usuarios = _mapper.Map<List<UsuarioReadDTO>>(_context.Usuarios.Skip(skip).Take(take)); 
 
         return Ok(usuarios);
     }

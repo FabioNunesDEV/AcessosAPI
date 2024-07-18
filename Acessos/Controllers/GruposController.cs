@@ -5,6 +5,7 @@ using Acessos.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -45,6 +46,39 @@ public class GruposController : ControllerBase
         if (grupo == null) return NotFound();
         var grupoReadDTO = _mapper.Map<GrupoReadDTO>(grupo);
         return Ok(grupoReadDTO);
+    }
+
+    /// <summary>
+    /// Retorna relação de usuários com grupo informando Id
+    /// </summary>
+    /// <param name="id">Id do grupo</param>
+    [HttpGet("{id}/usuarios")]
+    public IActionResult GetGrupoPorIdUsuarios([FromRoute] int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest("O Id deve ser um número maior que zero.");
+        }
+
+        var grupo = _context.Grupos
+            .Include(g => g.UsuarioGrupos)
+                .ThenInclude(ug => ug.Usuario)
+            .FirstOrDefault(g => g.Id == id);
+
+        if (grupo == null) return NotFound();
+
+        var response = new
+        {
+            Id = grupo.Id,
+            Nome = grupo.Nome,
+            Usuarios = grupo.UsuarioGrupos.Select(ug => new
+            {
+                Id = ug.Usuario.Id,
+                Nome = ug.Usuario.Nome
+            }).ToList()
+        };
+
+        return Ok(response);
     }
 
     [HttpGet]
