@@ -77,7 +77,7 @@ public class UsuariosController: ControllerBase
     /// </summary>
     /// <param name="skip">Posição inicial</param>
     /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
-    /// <returns>Retorna uma coleção de documentos</returns>
+    /// <returns>Retorna lista de usuários</returns>
     [HttpGet]
     public IActionResult GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
@@ -91,15 +91,15 @@ public class UsuariosController: ControllerBase
     /// Atualiza registro de usuario.
     /// </summary>
     /// <param name="id">Id do usuário</param>
-    /// <param name="usuario"></param>
-    [HttpPut("usuario/{id}")]
-    public IActionResult PutUsuario(int id, [FromBody] UsuarioUpdateDTO usuario)
+    /// <param name="usuarioDTO">Objeto DTO do usuario</param>
+    [HttpPut("{id}")]
+    public IActionResult PutUsuario(int id, [FromBody] UsuarioUpdateDTO usuarioDTO)
     {
         var usuarioOld = _context.Usuarios.FirstOrDefault(usuario=>usuario.Id == id);
 
         if (usuarioOld == null) return NotFound();
 
-        _mapper.Map(usuario, usuarioOld);
+        _mapper.Map(usuarioDTO, usuarioOld);
         _context.SaveChanges();
 
         return NoContent();
@@ -108,8 +108,8 @@ public class UsuariosController: ControllerBase
     /// <summary>
     /// Altera parcialmente as informações de um usuário informando seu id.
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="patchDoc"></param>
+    /// <param name="id">Id do usuário</param>
+    /// <param name="patchDoc">Array Json com as informações de alteração</param>
     /// <remarks>
     /// Exemplo de uso:
     ///
@@ -120,7 +120,7 @@ public class UsuariosController: ControllerBase
     ///     ]
     ///
     /// </remarks>
-    [HttpPatch("usuario/{id}")]
+    [HttpPatch("{id}")]
     public IActionResult PatchUsuario(int id, [FromBody] JsonPatchDocument<UsuarioUpdateDTO> patchDoc) 
     {
         var usuario = _context.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
@@ -146,8 +146,8 @@ public class UsuariosController: ControllerBase
     /// <summary>
     /// Deleta um usuario específico por seu id.
     /// </summary>
-    /// <param name="id"></param>
-    [HttpDelete("usuatio/{id}")]
+    /// <param name="id">Id do usuário</param>
+    [HttpDelete("{id}")]
     public IActionResult DeleteUsuario(int id)
     {
         if (id <= 0)
@@ -159,7 +159,7 @@ public class UsuariosController: ControllerBase
 
         if (usuario == null)
         {
-            return NotFound("Ususario não encontrado.");
+            return NotFound("Usuário não encontrado.");
         }
 
         _context.Usuarios.Remove(usuario);
@@ -210,6 +210,11 @@ public class UsuariosController: ControllerBase
         return Ok();
     }
 
+    /// <summary>
+    /// Cria um relacionamento entre usuário e grupo.
+    /// </summary>
+    /// <param name="usuarioId">Id do usuário</param>
+    /// <param name="grupoId">Id do grupo</param>
     [HttpDelete("{usuarioId}/grupos/{grupoId}")]
     public IActionResult DeleteUsuarioGrupo([FromRoute] int usuarioId, [FromRoute] int grupoId)
     {

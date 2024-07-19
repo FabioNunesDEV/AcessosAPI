@@ -24,6 +24,10 @@ public class GruposController : ControllerBase
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Cria um novo registro de grupo
+    /// </summary>
+    /// <param name="grupoDTO">Objeto DTO com informações do grupo</param>
     [HttpPost]
     [ProducesResponseType(typeof(Grupo), (int)HttpStatusCode.Created)]
     public IActionResult PostGrupo([FromBody] GrupoCreateDTO grupoDTO)
@@ -34,6 +38,10 @@ public class GruposController : ControllerBase
         return CreatedAtAction(nameof(GetGrupoPorId), new { id = grupo.Id }, grupo);
     }
 
+    /// <summary>
+    /// Recupera infromações de um grupo informando o Id
+    /// </summary>
+    /// <param name="id">Id do grupo</param>
     [HttpGet("{id}")]
     public IActionResult GetGrupoPorId([FromRoute] int id)
     {
@@ -81,13 +89,25 @@ public class GruposController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Retorna lista de usuários paginada.
+    /// </summary>
+    /// <param name="skip">Posição inicial</param>
+    /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
+    /// <returns>Retorna lista de grupos</returns>
     [HttpGet]
     public IEnumerable<GrupoReadDTO> GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
-        return _mapper.Map<List<GrupoReadDTO>>(_context.Grupos.Skip(skip).Take(take));
+        var grupos = _mapper.Map<List<GrupoReadDTO>>(_context.Grupos.Skip(skip).Take(take));
+        return grupos;
     }
 
-    [HttpPut("grupo/{id}")]
+    /// <summary>
+    /// Atualiza registro de grupo.
+    /// </summary>
+    /// <param name="id">Id do grupo</param>
+    /// <param name="grupoDTO">Objeto DTO do grupo</param>
+    [HttpPut("{id}")]
     public IActionResult PutGrupo(int id, [FromBody] GrupoUpdateDTO grupoDTO)
     {
         var grupoOld = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
@@ -100,7 +120,7 @@ public class GruposController : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch("grupo/{id}")]
+    [HttpPatch("{id}")]
     public IActionResult PatchGrupo(int id, [FromBody] JsonPatchDocument<GrupoUpdateDTO> patchDoc)
     {
         var grupo = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
@@ -122,7 +142,11 @@ public class GruposController : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("grupo/{id}")]
+    /// <summary>
+    /// Deleta um grupo específico informando seu id.
+    /// </summary>
+    /// <param name="id">Id do grupo</param>
+    [HttpDelete("{id}")]
     public IActionResult DeleteGrupo(int id)
     {
         if (id <= 0)
