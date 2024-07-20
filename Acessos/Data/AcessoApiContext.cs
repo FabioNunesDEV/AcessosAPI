@@ -31,6 +31,7 @@ public class AcessoApiContext : DbContext
             .HasForeignKey(ug => ug.GrupoId);
     }
 
+    public DbSet<Circular> Circulares { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<Grupo> Grupos { get; set; }
     public DbSet<UsuarioGrupo> UsuarioGrupos { get; set; }

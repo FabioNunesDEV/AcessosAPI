@@ -1,8 +1,6 @@
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System;
-using Acessos.Services;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Acessos.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +18,6 @@ var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConne
 builder.Services.AddDbContext<AcessoApiContext>(opts => opts.UseSqlServer(connectionString));
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSingleton<CircularService>();
 
 builder.Services.AddSwaggerGen(c =>
 {

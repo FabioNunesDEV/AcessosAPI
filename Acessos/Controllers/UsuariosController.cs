@@ -1,7 +1,6 @@
 ﻿using Acessos.Data;
 using Acessos.DTO.usuario;
 using Acessos.Models;
-using Acessos.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -55,7 +54,7 @@ public class UsuariosController: ControllerBase
                         .ThenInclude(ug => ug.Grupo)                       
                       .FirstOrDefault(u => u.Id == id);
 
-        if (usuario == null) return NotFound();
+        if (usuario == null) return NotFound($"Usuário com Id {id} não encontrado.");
 
         var response = new
         {
@@ -95,9 +94,14 @@ public class UsuariosController: ControllerBase
     [HttpPut("{id}")]
     public IActionResult PutUsuario(int id, [FromBody] UsuarioUpdateDTO usuarioDTO)
     {
+        if (id <= 0)
+        {
+            return BadRequest("O Id deve ser um numero maior que zero");
+        }
+
         var usuarioOld = _context.Usuarios.FirstOrDefault(usuario=>usuario.Id == id);
 
-        if (usuarioOld == null) return NotFound();
+        if (usuarioOld == null) return NotFound($"Usuário com Id {id} não encontrado.");
 
         _mapper.Map(usuarioDTO, usuarioOld);
         _context.SaveChanges();
@@ -159,7 +163,7 @@ public class UsuariosController: ControllerBase
 
         if (usuario == null)
         {
-            return NotFound("Usuário não encontrado.");
+            return NotFound($"Usuário com Id {id} não encontrado.");
         }
 
         _context.Usuarios.Remove(usuario);

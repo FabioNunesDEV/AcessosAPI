@@ -1,13 +1,11 @@
 ﻿using Acessos.Data;
 using Acessos.DTO.Grupo;
 using Acessos.Models;
-using Acessos.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using System.Text.RegularExpressions;
 
 namespace Acessos.Controllers;
 
@@ -51,7 +49,9 @@ public class GruposController : ControllerBase
         }
 
         var grupo = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
-        if (grupo == null) return NotFound();
+        
+        if (grupo == null) return NotFound($"Nenhum grupo encontrado com id {id}");
+
         var grupoReadDTO = _mapper.Map<GrupoReadDTO>(grupo);
         return Ok(grupoReadDTO);
     }
@@ -73,7 +73,7 @@ public class GruposController : ControllerBase
                 .ThenInclude(ug => ug.Usuario)
             .FirstOrDefault(g => g.Id == id);
 
-        if (grupo == null) return NotFound();
+        if (grupo == null) return NotFound($"Nenhum grupo encontrado com id {id}");
 
         var response = new
         {
@@ -110,9 +110,14 @@ public class GruposController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult PutGrupo(int id, [FromBody] GrupoUpdateDTO grupoDTO)
     {
+        if (id<=0)
+        {
+            return BadRequest("O Id deve ser um número maior que zero");
+        }
+
         var grupoOld = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
 
-        if (grupoOld == null) return NotFound();
+        if (grupoOld == null) return NotFound($"Nenhum grupo encontrado com id {id}");
 
         _mapper.Map(grupoDTO, grupoOld);
         _context.SaveChanges();
@@ -120,12 +125,31 @@ public class GruposController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Altera parcialmente as informações de um grupo informando seu Id.
+    /// </summary>
+    /// <param name="id">Id do Grupo</param>
+    /// <param name="patchDoc">Array Json com as informações de alteração</param>
+    /// <remarks>
+    /// Exemplo de uso:
+    ///
+    ///     Patch 
+    ///     [
+    ///         { "op": "replace", "path": "/nome", "value": "NovoNome" },
+    ///     ]
+    ///
+    /// </remarks>
     [HttpPatch("{id}")]
     public IActionResult PatchGrupo(int id, [FromBody] JsonPatchDocument<GrupoUpdateDTO> patchDoc)
     {
+        if (id <= 0)
+        {
+            return BadRequest("O Id deve ser um numero maior que zero");
+        }
+
         var grupo = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
 
-        if (grupo == null) return NotFound();
+        if (grupo == null) return NotFound($"Nenhum grupo encontrado com id {id}");
 
         var grupoDTO = _mapper.Map<GrupoUpdateDTO>(grupo);
 
@@ -158,7 +182,7 @@ public class GruposController : ControllerBase
 
         if (grupo == null)
         {
-            return NotFound("Grupo não encontrado.");
+            return NotFound($"Nenhum grupo encontrado com id {id}");
         }
 
         _context.Grupos.Remove(grupo);
