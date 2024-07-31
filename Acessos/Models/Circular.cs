@@ -13,9 +13,11 @@ public class Circular
     [Required]
     public string Protocolo {  get; set; }
 
-    [Column(TypeName ="nvarchar(36)")]
+    [Required]
+    [Column(TypeName ="nvarchar(300)")]
     public string Assunto { get; set; }
 
+    [Required]
     [Column(TypeName = "nvarchar(3000)")]
     public string Conteudo { get; set; }
 

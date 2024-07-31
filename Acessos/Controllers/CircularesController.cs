@@ -4,6 +4,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Acessos.Data;
 using System.Net;
+using Acessos.Services;
 
 namespace Acessos.Controllers
 {
@@ -13,137 +14,181 @@ namespace Acessos.Controllers
     {
         private readonly AcessoApiContext _context;
         private readonly IMapper _mapper;
+        private readonly CircularesService _circularesService;
 
-        public CircularesController(AcessoApiContext context, IMapper mapper)
+        public CircularesController(
+            AcessoApiContext context,
+            IMapper mapper,
+            CircularesService circularesService)
         {
             _context = context;
             _mapper = mapper;
+            _circularesService = circularesService;
         }
 
         /// <summary>
-        /// Cria um novo registro para Circular
+        /// Cria um novo registro para Circular.
         /// </summary>
-        /// <param name="circularDTO">Objeto DTO com informações da circular</param>
+        /// <param name="circularDTO">Objeto DTO com informações da circular.</param>
+        /// <returns>
+        /// Retorna Created (HTTP 201) com os detalhes da circular criada.
+        /// </returns>
+        /// <response code="201">Circular criada com sucesso.</response>
+        /// <response code="400">O objeto DTO fornecido é inválido.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Circular), (int)HttpStatusCode.Created)]
         public IActionResult PostCircular([FromBody] CircularCreateDTO circularDTO)
         {
-            var circular = _mapper.Map<Circular>(circularDTO);
-
-            // Preenche campos automaticamente.
-            circular.Protocolo = Guid.NewGuid().ToString();
-            circular.DataEnvio = DateTime.Now;
-            circular.Status = "Pendente";
-
-            _context.Circulares.Add(circular);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetCircularPorId), new { id = circular.Id }, circular);
+            return HandleRequest(() =>
+            {
+                var circular = _circularesService.CadastrarCircular(circularDTO);
+                return CreatedAtAction(nameof(GetCircularPorId), new { id = circular.Id }, circular);
+            });
         }
 
         /// <summary>
-        /// Retorna lista de circulares paginada.
+        /// Retorna uma lista paginada de circulares.
         /// </summary>
-        /// <param name="skip">Posição inicial</param>
-        /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
-        /// <returns>Retorna lista de Cirulares.</returns>
+        /// <param name="skip">Posição inicial para a paginação.</param>
+        /// <param name="take">Número de registros a serem obtidos a partir da posição inicial.</param>
+        /// <returns>
+        /// Retorna Ok (HTTP 200) com a lista de circulares.
+        /// </returns>
+        /// <response code="200">Lista de circulares retornada com sucesso.</response>
         [HttpGet]
-        public IEnumerable<CircularReadDTO> GetCircularLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
+        public IActionResult GetCircularLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            var circulares = _mapper.Map<List<CircularReadDTO>>(_context.Circulares.Skip(skip).Take(take));
-            return circulares;
+            return HandleRequest(() =>
+            {
+                var circulares = _circularesService.ObterListaCirculares(skip, take);
+                return Ok(circulares);
+            });
         }
 
         /// <summary>
-        /// Recupera infromações de uma circular informando o Id
+        /// Recupera informações de uma circular específica informando seu id.
         /// </summary>
-        /// <param name="id">Id da circular</param>
+        /// <param name="id">Id da circular a ser recuperada.</param>
+        /// <returns>
+        /// Retorna Ok (HTTP 200) com os detalhes da circular se encontrada,
+        /// NotFound (HTTP 404) se a circular não for encontrada,
+        /// ou BadRequest (HTTP 400) se o id for inválido.
+        /// </returns>
+        /// <response code="200">Detalhes da circular retornados com sucesso.</response>
+        /// <response code="404">Circular com o id especificado não foi encontrada.</response>
+        /// <response code="400">O id fornecido é inválido.</response>
         [HttpGet("{id}")]
         public IActionResult GetCircularPorId([FromRoute] int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest("O Id deve ser um número maior que zero.");
-            }
+            return HandleRequest(() => {
 
-            var circular = _context.Circulares.FirstOrDefault(c => c.Id == id);
-            if (circular == null)
-            {
-                return NotFound($"Circular com Id {id} não encontrada.");
-            }
+                var circular = _circularesService.ObterCircularPorId(id);
+                return Ok(circular);
 
-            var circularDTO = _mapper.Map<CircularReadDTO>(circular);
-            return Ok(circularDTO);
+            });
         }
 
         /// <summary>
-        /// Atualiza registro de Circular.
+        /// Atualiza o registro de uma circular específica informando seu id.
         /// </summary>
-        /// <param name="id">Id da circular</param>
-        /// <param name="circularDTO">Objeto DTO da circular</param>
+        /// <param name="id">Id da circular a ser atualizada.</param>
+        /// <param name="circularDTO">Objeto DTO com as novas informações da circular.</param>
+        /// <returns>
+        /// Retorna NoContent (HTTP 204) se a atualização for bem-sucedida, 
+        /// NotFound (HTTP 404) se a circular não for encontrada, 
+        /// ou BadRequest (HTTP 400) se o id for inválido.
+        /// </returns>
+        /// <response code="204">Circular atualizada com sucesso.</response>
+        /// <response code="404">Circular com o id especificado não foi encontrada.</response>
+        /// <response code="400">O id fornecido é inválido.</response>
         [HttpPut("{id}")]
         public IActionResult PutCircular(int id, [FromBody] CircularUpdateDTO circularDTO)
         {
-            if (id <= 0)
+            return HandleRequest(() =>
             {
-                return BadRequest("O Id deve ser um número maior que zero");
-            }
-
-            var circular = _context.Circulares.FirstOrDefault(c => c.Id == id);
-            if (circular == null)
-            {
-                return NotFound($"Circular com Id {id} não encontrada.");
-            }
-
-            _mapper.Map(circularDTO, circular);
-            _context.SaveChanges();
-
-            return NoContent();
+                _circularesService.AtualizarCircular(id, circularDTO);
+                return NoContent();
+            });
         }
 
+        /// <summary>
+        /// Marca uma circular como lida, atualizando seu status e data de recebimento.
+        /// </summary>
+        /// <param name="id">Id da circular a ser marcada como lida.</param>
+        /// <returns>
+        /// Retorna NoContent (HTTP 204) se a atualização for bem-sucedida, 
+        /// NotFound (HTTP 404) se a circular não for encontrada, 
+        /// ou BadRequest (HTTP 400) se o id for inválido.
+        /// </returns>
+        /// <response code="204">Circular marcada como lida com sucesso.</response>
+        /// <response code="404">Circular com o id especificado não foi encontrada.</response>
+        /// <response code="400">O id fornecido é inválido.</response>
         [HttpPut("{id}/Lida")]
         public IActionResult PutCircularLida(int id)
         {
-            if (id <= 0)
+            return HandleRequest(() =>
             {
-                return BadRequest("O Id deve ser um número maior que zero");
-            }
-
-            var circular = _context.Circulares.FirstOrDefault(c => c.Id == id);
-            if (circular == null)
-            {
-                return NotFound($"Circular com Id {id} não encontrada.");
-            }
-
-            circular.DataRecebimento=DateTime.Now;
-            circular.Status = "Lida";
-
-            _context.SaveChanges();
-
-            return NoContent();
+                _circularesService.AtualizarComoLida(id);
+                return NoContent();
+            });
         }
 
         /// <summary>
         /// Deleta uma circular específica informando seu id.
         /// </summary>
-        /// <param name="id">Id da Circular</param>
+        /// <param name="id">Id da Circular a ser deletada.</param>
+        /// <returns>
+        /// Retorna NoContent (HTTP 204) se a exclusão for bem-sucedida,
+        /// NotFound (HTTP 404) se a circular não for encontrada,
+        /// ou BadRequest (HTTP 400) se o id for inválido.
+        /// </returns>
+        /// <response code="204">Circular deletada com sucesso.</response>
+        /// <response code="404">Circular com o id especificado não foi encontrada.</response>
+        /// <response code="400">O id fornecido é inválido.</response>
         [HttpDelete("{id}")]
         public IActionResult DeleteCircular([FromRoute] int id)
         {
-            if (id <= 0)
+            return HandleRequest(() =>
             {
-                return BadRequest("O Id deve ser um número maior que zero");
-            }
+                _circularesService.DeletarCircular(id);
 
-            var circular = _context.Circulares.FirstOrDefault(c => c.Id == id);
-            if (circular == null)
+                return NoContent();
+            });
+        }
+
+        /// <summary>
+        /// Trata com a execução de uma função fornecida e padroniza o tratamento de exceções.
+        /// </summary>
+        /// <param name="func">A função a ser executada, que retorna um IActionResult.</param>
+        /// <returns>
+        /// Retorna o resultado da execução da função ou uma resposta de erro apropriada se ocorrer uma exceção.
+        /// </returns>
+        /// <remarks>
+        /// Este método captura exceções específicas e retorna respostas HTTP padronizadas:
+        /// <list type="bullet">
+        /// <item><description>ArgumentException: Retorna um BadRequest (HTTP 400) com a mensagem da exceção.</description></item>
+        /// <item><description>KeyNotFoundException: Retorna um NotFound (HTTP 404) com a mensagem da exceção.</description></item>
+        /// <item><description>Exception: Retorna um StatusCode (HTTP 500) com uma mensagem de erro genérica e os detalhes da exceção.</description></item>
+        /// </list>
+        /// </remarks>
+        private IActionResult HandleRequest(Func<IActionResult> func)
+        {
+            try
             {
-                return NotFound($"Circular com Id {id} não encontrada.");
+                return func();
             }
-
-            _context.Circulares.Remove(circular);
-            _context.SaveChanges();
-
-            return NoContent();
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocorreu um erro interno no servidor.\n{ex}");
+            }
         }
     }
 }

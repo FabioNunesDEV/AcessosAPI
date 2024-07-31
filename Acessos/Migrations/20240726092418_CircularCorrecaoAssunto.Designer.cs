@@ -4,6 +4,7 @@ using Acessos.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Acessos.Migrations
 {
     [DbContext(typeof(AcessoApiContext))]
-    partial class AcessoApiContextModelSnapshot : ModelSnapshot
+    [Migration("20240726092418_CircularCorrecaoAssunto")]
+    partial class CircularCorrecaoAssunto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,11 +34,9 @@ namespace Acessos.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Assunto")
-                        .IsRequired()
                         .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Conteudo")
-                        .IsRequired()
                         .HasColumnType("nvarchar(3000)");
 
                     b.Property<DateTime>("DataEnvio")

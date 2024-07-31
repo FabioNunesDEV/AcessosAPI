@@ -3,6 +3,7 @@ using System.Reflection;
 using System;
 using Acessos.Data;
 using Microsoft.EntityFrameworkCore;
+using Acessos.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,9 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 
 // Add Automapper a aplicação
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+// Add classes de seriços
+builder.Services.AddScoped<CircularesService>();
 
 // Definido conexão com o banco de dados
 var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
