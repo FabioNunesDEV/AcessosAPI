@@ -1,10 +1,10 @@
 ﻿using Acessos.Data;
 using Acessos.DTO.Grupo;
+using Acessos.Exceptions;
 using Acessos.Models;
-using AutoMapper;
+using Acessos.Services;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace Acessos.Controllers;
@@ -13,13 +13,11 @@ namespace Acessos.Controllers;
 [Route("api/v1/grupos")]
 public class GruposController : ControllerBase
 {
-    private readonly AcessoApiContext _context;
-    private readonly IMapper _mapper;
+    private readonly GruposService _gruposService;
 
-    public GruposController(AcessoApiContext context, IMapper mapper)
+    public GruposController(GruposService gruposService)
     {
-        _context = context;
-        _mapper = mapper;
+        _gruposService = gruposService;
     }
 
     /// <summary>
@@ -30,30 +28,25 @@ public class GruposController : ControllerBase
     [ProducesResponseType(typeof(Grupo), (int)HttpStatusCode.Created)]
     public IActionResult PostGrupo([FromBody] GrupoCreateDTO grupoDTO)
     {
-        Grupo grupo = _mapper.Map<Grupo>(grupoDTO);
-        _context.Grupos.Add(grupo);
-        _context.SaveChanges();
-        return CreatedAtAction(nameof(GetGrupoPorId), new { id = grupo.Id }, grupo);
+        return Requisicao.Manipulador(() =>
+        {
+            var grupo = _gruposService.CadastrarGrupo(grupoDTO);
+            return CreatedAtAction(nameof(GetGrupoPorId), new { id = grupo.Id }, grupo);
+        });
     }
 
     /// <summary>
-    /// Recupera infromações de um grupo informando o Id
+    /// Recupera informações de um grupo informando o Id
     /// </summary>
     /// <param name="id">Id do grupo</param>
     [HttpGet("{id}")]
     public IActionResult GetGrupoPorId([FromRoute] int id)
     {
-        if (id <= 0)
+        return Requisicao.Manipulador(() =>
         {
-            return BadRequest("O Id deve ser um número maior que zero.");
-        }
-
-        var grupo = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
-        
-        if (grupo == null) return NotFound($"Nenhum grupo encontrado com id {id}");
-
-        var grupoReadDTO = _mapper.Map<GrupoReadDTO>(grupo);
-        return Ok(grupoReadDTO);
+            var grupo = _gruposService.ObterGrupoPorId(id);
+            return Ok(grupo);
+        });
     }
 
     /// <summary>
@@ -63,43 +56,27 @@ public class GruposController : ControllerBase
     [HttpGet("{id}/usuarios")]
     public IActionResult GetGrupoPorIdUsuarios([FromRoute] int id)
     {
-        if (id <= 0)
+        return Requisicao.Manipulador(() =>
         {
-            return BadRequest("O Id deve ser um número maior que zero.");
-        }
-
-        var grupo = _context.Grupos
-            .Include(g => g.UsuarioGrupos)
-                .ThenInclude(ug => ug.Usuario)
-            .FirstOrDefault(g => g.Id == id);
-
-        if (grupo == null) return NotFound($"Nenhum grupo encontrado com id {id}");
-
-        var response = new
-        {
-            Id = grupo.Id,
-            Nome = grupo.Nome,
-            Usuarios = grupo.UsuarioGrupos.Select(ug => new
-            {
-                Id = ug.Usuario.Id,
-                Nome = ug.Usuario.Nome
-            }).ToList()
-        };
-
-        return Ok(response);
+            var grupo = _gruposService.ObterGrupoPorId(id);
+            return Ok(grupo);
+        });
     }
 
     /// <summary>
-    /// Retorna lista de usuários paginada.
+    /// Retorna lista de grupos paginada.
     /// </summary>
     /// <param name="skip">Posição inicial</param>
-    /// <param name="take">Quantos regstros serão obtidos a partir da posição inicial</param>
+    /// <param name="take">Quantos registros serão obtidos a partir da posição inicial</param>
     /// <returns>Retorna lista de grupos</returns>
     [HttpGet]
-    public IEnumerable<GrupoReadDTO> GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
+    public IActionResult GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
-        var grupos = _mapper.Map<List<GrupoReadDTO>>(_context.Grupos.Skip(skip).Take(take));
-        return grupos;
+        return Requisicao.Manipulador(() =>
+        {
+            var grupos = _gruposService.ObterListaGrupos(skip, take);
+            return Ok(grupos);
+        });
     }
 
     /// <summary>
@@ -110,19 +87,11 @@ public class GruposController : ControllerBase
     [HttpPut("{id}")]
     public IActionResult PutGrupo(int id, [FromBody] GrupoUpdateDTO grupoDTO)
     {
-        if (id<=0)
+        return Requisicao.Manipulador(() =>
         {
-            return BadRequest("O Id deve ser um número maior que zero");
-        }
-
-        var grupoOld = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
-
-        if (grupoOld == null) return NotFound($"Nenhum grupo encontrado com id {id}");
-
-        _mapper.Map(grupoDTO, grupoOld);
-        _context.SaveChanges();
-
-        return NoContent();
+            _gruposService.AtualizarGrupo(id, grupoDTO);
+            return NoContent();
+        });
     }
 
     /// <summary>
@@ -142,28 +111,11 @@ public class GruposController : ControllerBase
     [HttpPatch("{id}")]
     public IActionResult PatchGrupo(int id, [FromBody] JsonPatchDocument<GrupoUpdateDTO> patchDoc)
     {
-        if (id <= 0)
+        return Requisicao.Manipulador(() =>
         {
-            return BadRequest("O Id deve ser um numero maior que zero");
-        }
-
-        var grupo = _context.Grupos.FirstOrDefault(grupo => grupo.Id == id);
-
-        if (grupo == null) return NotFound($"Nenhum grupo encontrado com id {id}");
-
-        var grupoDTO = _mapper.Map<GrupoUpdateDTO>(grupo);
-
-        patchDoc.ApplyTo(grupoDTO, ModelState);
-
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        _mapper.Map(grupoDTO, grupo);
-        _context.SaveChanges();
-
-        return NoContent();
+            _gruposService.AtualizarGrupoParcialmente(id, patchDoc);
+            return NoContent();
+        });
     }
 
     /// <summary>
@@ -173,21 +125,10 @@ public class GruposController : ControllerBase
     [HttpDelete("{id}")]
     public IActionResult DeleteGrupo(int id)
     {
-        if (id <= 0)
+        return Requisicao.Manipulador(() =>
         {
-            return BadRequest("O Id do grupo deve ser maior que zero.");
-        }
-
-        var grupo = _context.Grupos.FirstOrDefault(c => c.Id == id);
-
-        if (grupo == null)
-        {
-            return NotFound($"Nenhum grupo encontrado com id {id}");
-        }
-
-        _context.Grupos.Remove(grupo);
-        _context.SaveChanges();
-
-        return NoContent();
+            _gruposService.DeletarGrupo(id);
+            return NoContent();
+        });
     }
 }

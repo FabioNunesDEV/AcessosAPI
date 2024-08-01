@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Acessos.Data;
 using System.Net;
 using Acessos.Services;
+using Acessos.Exceptions;
 
 namespace Acessos.Controllers
 {
@@ -12,8 +13,7 @@ namespace Acessos.Controllers
     [Route("api/v1/circulares")]
     public class CircularesController : ControllerBase
     {
-        private readonly AcessoApiContext _context;
-        private readonly IMapper _mapper;
+
         private readonly CircularesService _circularesService;
 
         public CircularesController(
@@ -21,8 +21,6 @@ namespace Acessos.Controllers
             IMapper mapper,
             CircularesService circularesService)
         {
-            _context = context;
-            _mapper = mapper;
             _circularesService = circularesService;
         }
 
@@ -39,7 +37,7 @@ namespace Acessos.Controllers
         [ProducesResponseType(typeof(Circular), (int)HttpStatusCode.Created)]
         public IActionResult PostCircular([FromBody] CircularCreateDTO circularDTO)
         {
-            return HandleRequest(() =>
+            return Requisicao.Manipulador(() =>
             {
                 var circular = _circularesService.CadastrarCircular(circularDTO);
                 return CreatedAtAction(nameof(GetCircularPorId), new { id = circular.Id }, circular);
@@ -58,7 +56,7 @@ namespace Acessos.Controllers
         [HttpGet]
         public IActionResult GetCircularLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
-            return HandleRequest(() =>
+            return Requisicao.Manipulador(() =>
             {
                 var circulares = _circularesService.ObterListaCirculares(skip, take);
                 return Ok(circulares);
@@ -80,7 +78,7 @@ namespace Acessos.Controllers
         [HttpGet("{id}")]
         public IActionResult GetCircularPorId([FromRoute] int id)
         {
-            return HandleRequest(() => {
+            return Requisicao.Manipulador(() => {
 
                 var circular = _circularesService.ObterCircularPorId(id);
                 return Ok(circular);
@@ -104,7 +102,7 @@ namespace Acessos.Controllers
         [HttpPut("{id}")]
         public IActionResult PutCircular(int id, [FromBody] CircularUpdateDTO circularDTO)
         {
-            return HandleRequest(() =>
+            return Requisicao.Manipulador(() =>
             {
                 _circularesService.AtualizarCircular(id, circularDTO);
                 return NoContent();
@@ -126,7 +124,7 @@ namespace Acessos.Controllers
         [HttpPut("{id}/Lida")]
         public IActionResult PutCircularLida(int id)
         {
-            return HandleRequest(() =>
+            return Requisicao.Manipulador(() =>
             {
                 _circularesService.AtualizarComoLida(id);
                 return NoContent();
@@ -148,47 +146,12 @@ namespace Acessos.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCircular([FromRoute] int id)
         {
-            return HandleRequest(() =>
+            return Requisicao.Manipulador(() =>
             {
                 _circularesService.DeletarCircular(id);
 
                 return NoContent();
             });
-        }
-
-        /// <summary>
-        /// Trata com a execução de uma função fornecida e padroniza o tratamento de exceções.
-        /// </summary>
-        /// <param name="func">A função a ser executada, que retorna um IActionResult.</param>
-        /// <returns>
-        /// Retorna o resultado da execução da função ou uma resposta de erro apropriada se ocorrer uma exceção.
-        /// </returns>
-        /// <remarks>
-        /// Este método captura exceções específicas e retorna respostas HTTP padronizadas:
-        /// <list type="bullet">
-        /// <item><description>ArgumentException: Retorna um BadRequest (HTTP 400) com a mensagem da exceção.</description></item>
-        /// <item><description>KeyNotFoundException: Retorna um NotFound (HTTP 404) com a mensagem da exceção.</description></item>
-        /// <item><description>Exception: Retorna um StatusCode (HTTP 500) com uma mensagem de erro genérica e os detalhes da exceção.</description></item>
-        /// </list>
-        /// </remarks>
-        private IActionResult HandleRequest(Func<IActionResult> func)
-        {
-            try
-            {
-                return func();
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocorreu um erro interno no servidor.\n{ex}");
-            }
         }
     }
 }
