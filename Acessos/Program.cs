@@ -16,6 +16,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add classes de seriços
 builder.Services.AddScoped<CircularesService>();
+builder.Services.AddScoped<UsuariosService>();
+builder.Services.AddScoped<GruposService>();
 
 // Definido conexão com o banco de dados
 var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
