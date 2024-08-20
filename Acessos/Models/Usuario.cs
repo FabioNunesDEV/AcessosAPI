@@ -23,10 +23,6 @@ public class Usuario
     [DataType(DataType.Password)]
     public string Senha { get; set; }
 
-    [Required]
-    [Compare("Senha")]
-    public string ConfirmacaoSenha { get; set; }
-
     public string Salt { get; set; }
 
     public virtual ICollection<UsuarioGrupo> UsuarioGrupos { get; set; }

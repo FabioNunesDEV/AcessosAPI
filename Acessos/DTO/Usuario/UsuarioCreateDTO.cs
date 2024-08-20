@@ -13,4 +13,13 @@ public class UsuarioCreateDTO
     [EmailAddress(ErrorMessage = "Email informado não é válido.")]
     public string Email { get; set; }
 
+    [Required(ErrorMessage = "Campo senha obrigatório.")]
+    [DataType(DataType.Password)]
+    public string Senha { get; set; }
+
+    [Required(ErrorMessage = "Campo confirmação de senha obrigatório.")]
+    [DataType(DataType.Password)]
+    [Compare("Senha", ErrorMessage = "As senhas não conferem.")]
+    public string ConfirmacaoSenha { get; set; }
+
 }

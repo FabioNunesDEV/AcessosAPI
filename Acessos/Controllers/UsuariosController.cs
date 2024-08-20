@@ -43,7 +43,7 @@ public class UsuariosController : ControllerBase
     {
         return Requisicao.Manipulador(() =>
         {
-            var usuario = _usuariosService.ObterUsuarioPorIdGrupos(id);
+            var usuario = _usuariosService.ObterUsuarioPorId(id);
             return Ok(usuario);
         });
     }

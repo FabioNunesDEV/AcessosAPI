@@ -1,6 +1,7 @@
 ﻿using Acessos.Data;
 using Acessos.DTO.usuario;
 using Acessos.Models;
+using Acessos.Utilities;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,10 @@ namespace Acessos.Services
         public Usuario CadastrarUsuario(UsuarioCreateDTO dto)
         {
             var usuario = _mapper.Map<Usuario>(dto);
+
+            usuario.Salt = Util.GerarSalt();
+            usuario.Senha = Util.GerarHash(usuario.Senha + "-" + usuario.Salt);
+
             _context.Usuarios.Add(usuario);
             _context.SaveChanges();
             return usuario;
