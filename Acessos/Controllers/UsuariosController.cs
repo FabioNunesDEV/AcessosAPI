@@ -49,6 +49,20 @@ public class UsuariosController : ControllerBase
     }
 
     /// <summary>
+    /// Recuperar informação de usuário e seus grupos relacionados pelo id de usuário
+    /// </summary>
+    /// <param name="id">Id do usuário.</param>
+    [HttpGet("{id}/grupo")]
+    public IActionResult GetUsuarioPorIdGrupos([FromRoute] int id)
+    {
+        return Requisicao.Manipulador(() =>
+        {
+            var usuario = _usuariosService.ObterUsuarioPorIdGrupos(id);
+            return Ok(usuario);
+        });
+    }
+
+    /// <summary>
     /// Recupera uma listagem de usuários paginada.
     /// </summary>
     /// <param name="skip">Posição inicial</param>

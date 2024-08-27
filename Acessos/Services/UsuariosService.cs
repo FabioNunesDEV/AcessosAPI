@@ -57,7 +57,7 @@ namespace Acessos.Services
                 Id = usuario.Id,
                 Nome = usuario.Nome,
                 Email = usuario.Email,
-                Usuarios = usuario.UsuarioGrupos.Select(ug => new
+                Grupos = usuario.UsuarioGrupos.Select(ug => new
                 {
                     Id = ug.Grupo.Id,
                     Nome = ug.Grupo.Nome
