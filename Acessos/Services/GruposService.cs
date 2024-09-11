@@ -86,6 +86,14 @@ namespace Acessos.Services
         {
             ValidarId(id);
             var grupo = ObterGrupoCadastrado(id);
+
+            // Verifica se o grupo tem usuários associados
+            bool hasUsers = _context.UsuarioGrupos.Any(ug => ug.GrupoId == id);
+            if (hasUsers)
+            {
+                throw new InvalidOperationException("Não é possível deletar o grupo porque ele possui usuários associados. Exclua as relações primeiro.");
+            }
+
             _context.Grupos.Remove(grupo);
             _context.SaveChanges();
         }

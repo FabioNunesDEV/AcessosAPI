@@ -28,7 +28,8 @@ public class AcessoApiContext : DbContext
         modelBuilder.Entity<UsuarioGrupo>()
             .HasOne(ug => ug.Grupo)
             .WithMany(g => g.UsuarioGrupos)
-            .HasForeignKey(ug => ug.GrupoId);
+            .HasForeignKey(ug => ug.GrupoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     public DbSet<Circular> Circulares { get; set; }
