@@ -15,6 +15,10 @@ public class Usuario
     public string Nome { get; set; }
 
     [Required]
+    [MaxLength(30)]
+    public string Login {  get; set; }
+
+    [Required]
     [MaxLength(80)]
     [EmailAddress]
     public string Email { get; set; }

@@ -70,6 +70,18 @@ namespace Acessos.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<bool>("PodeAlterar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PodeCriar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PodeDeletar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PodeLer")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("Grupo");
@@ -87,6 +99,11 @@ namespace Acessos.Migrations
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Nome")
                         .IsRequired()

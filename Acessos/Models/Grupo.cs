@@ -14,5 +14,17 @@ public class Grupo
     [MaxLength(80)]
     public string Nome { get; set; }
 
+    [Required]
+    public bool PodeCriar { get; set; }
+
+    [Required]
+    public bool PodeLer { get; set; }
+
+    [Required]
+    public bool PodeAlterar { get; set; }
+
+    [Required]
+    public bool PodeDeletar { get; set; }
+
     public virtual ICollection<UsuarioGrupo> UsuarioGrupos { get; set; }
 }

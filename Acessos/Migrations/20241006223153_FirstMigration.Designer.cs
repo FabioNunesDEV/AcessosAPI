@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Acessos.Migrations
 {
     [DbContext(typeof(AcessoApiContext))]
-    [Migration("20240726092418_CircularCorrecaoAssunto")]
-    partial class CircularCorrecaoAssunto
+    [Migration("20241006223153_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,9 +34,11 @@ namespace Acessos.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Assunto")
+                        .IsRequired()
                         .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Conteudo")
+                        .IsRequired()
                         .HasColumnType("nvarchar(3000)");
 
                     b.Property<DateTime>("DataEnvio")
@@ -71,6 +73,18 @@ namespace Acessos.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<bool>("PodeAlterar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PodeCriar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PodeDeletar")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PodeLer")
+                        .HasColumnType("bit");
+
                     b.HasKey("Id");
 
                     b.ToTable("Grupo");
@@ -89,10 +103,22 @@ namespace Acessos.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Salt")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Senha")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -119,7 +145,7 @@ namespace Acessos.Migrations
                     b.HasOne("Acessos.Models.Grupo", "Grupo")
                         .WithMany("UsuarioGrupos")
                         .HasForeignKey("GrupoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Acessos.Models.Usuario", "Usuario")

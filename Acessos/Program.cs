@@ -21,10 +21,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<CircularesService>();
 builder.Services.AddScoped<UsuariosService>();
 builder.Services.AddScoped<GruposService>();
-
-// Definido conexão com o banco de dados
-var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
-builder.Services.AddDbContext<AcessoApiContext>(opts => opts.UseSqlServer(connectionString));
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<AuthService>();
 
 // Configurar autenticação JWT
 builder.Services.AddAuthentication(options =>
@@ -36,15 +34,17 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "yourIssuer",
-        ValidAudience = "yourAudience",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("yourSecretKey"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("123456789012345678901234567890123")),
+        ValidateAudience = false,
+        ValidateIssuer = false,
+        ClockSkew = TimeSpan.Zero
     };
 });
+
+// Definido conexão com o banco de dados
+var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
+builder.Services.AddDbContext<AcessoApiContext>(opts => opts.UseSqlServer(connectionString));
 
 builder.Services.AddEndpointsApiExplorer();
 
