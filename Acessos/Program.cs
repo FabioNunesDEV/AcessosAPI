@@ -21,7 +21,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<CircularesService>();
 builder.Services.AddScoped<UsuariosService>();
 builder.Services.AddScoped<GruposService>();
-builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<AuthService>();
 
 // Configurar autenticação JWT

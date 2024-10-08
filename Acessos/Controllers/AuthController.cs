@@ -22,8 +22,8 @@ public class AuthController:ControllerBase
     {
         return Requisicao.Manipulador(() =>
         {
-            var usuario = _authService.ObterUsuario(dto);
-            return Ok();
+            var token = _authService.ObterToken(dto);
+            return Ok(token);
         });
     }
 
