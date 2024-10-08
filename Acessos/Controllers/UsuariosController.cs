@@ -62,12 +62,16 @@ public class UsuariosController : ControllerBase
         });
     }
 
-    [HttpGet("{login}")]
-    public IActionResult GetUsuarioPorLogin([FromRoute] int id)
+    /// <summary>
+    /// Recuperar informação de usuário pelo seu login
+    /// </summary>
+    /// <param name="login">Login do usuário.</param>
+    [HttpGet("login/{login}")]
+    public IActionResult GetUsuarioPorLogin([FromRoute] string login)
     {
         return Requisicao.Manipulador(() =>
         {
-            var usuario = _usuariosService.ObterUsuarioPorIdGrupos(id);
+            var usuario = _usuariosService.ObterUsuarioPorLogin(login);
             return Ok(usuario);
         });
     }

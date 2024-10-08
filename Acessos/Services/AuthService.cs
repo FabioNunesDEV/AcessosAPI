@@ -1,5 +1,7 @@
 ﻿using Acessos.Data;
 using Acessos.DTO.Auth;
+using Acessos.DTO.Grupo;
+using Acessos.Models;
 using Acessos.Utilities;
 
 namespace Acessos.Services;
@@ -31,7 +33,7 @@ public class AuthService
     public string ObterUsuario(AuthReadDTO dto)
     {
         // Obter informações do usuário (exemplo simplificado)
-        var usuario = _context.Usuarios.FirstOrDefault(u => u.Nome == dto.Login);
+        var usuario = _context.Usuarios.FirstOrDefault(u => u.Login == dto.Login);
         if (usuario == null)
         {
             return "Usuário não encontrado.";
@@ -51,7 +53,23 @@ public class AuthService
             .Select(gu => gu.GrupoId)
             .ToList();
 
+        List<string> stringList = gruposIds.ConvertAll(i => i.ToString());
+
+        // Obter lista de grupos aos quais o usuário pertence
+        var grupos = _context.UsuarioGrupos
+            .Where(gu => gu.UsuarioId == usuario.Id)
+            .Select(gu => gu.Grupo)
+            .ToList();
+
+        var grupoPermissaoDTO = new GrupoPermissaoDTO
+        {
+            PodeCriar = grupos.Any(g => g.PodeCriar),
+            PodeLer = grupos.Any(g => g.PodeLer),
+            PodeAlterar = grupos.Any(g => g.PodeAlterar),
+            PodeDeletar = grupos.Any(g => g.PodeDeletar)
+        };
+
         // Gerar token usando TokenService
-        return _tokenService.GenerateToken(usuario.Id, usuario.Login, gruposIds);
+        return _tokenService.GenerateToken(usuario.Id.ToString(), usuario.Login, stringList);
     }
 }

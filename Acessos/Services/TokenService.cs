@@ -19,7 +19,7 @@ public class TokenService
     /// <param name="userLogin">O nome do usuário.</param>
     /// <param name="groupIds">A lista de IDs de grupos aos quais o usuário pertence.</param>
     /// <returns>Um token JWT como uma string.</returns>
-    public string GenerateToken(int userId, string userLogin, List<string> groupIds)
+    public string GenerateToken(string userId, string userLogin, List<string> groupIds)
     {
         var claims = new List<Claim>
             {
