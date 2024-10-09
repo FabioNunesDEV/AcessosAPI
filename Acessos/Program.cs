@@ -20,11 +20,12 @@ builder.Services.AddScoped<UsuariosService>();
 builder.Services.AddScoped<GruposService>();
 builder.Services.AddScoped<AuthService>();
 
-// Add TokenService sem necessidade de passar a chave secreta
-builder.Services.AddScoped<ITokenService, TokenService>();
+// Carregar configurações do JWT do appsettings.json
+var jwtSettingsSection = builder.Configuration.GetSection("Jwt");
+builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 
-// Configurar autenticação JWT através do AuthService
-// var serviceProvider = builder.Services.BuildServiceProvider();
+// Add TokenService 
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Definido conexão com o banco de dados
 var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");

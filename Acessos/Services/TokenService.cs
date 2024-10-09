@@ -11,6 +11,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Acessos.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 
 namespace Acessos.Services;
 
@@ -19,7 +20,12 @@ namespace Acessos.Services;
 /// </summary>
 public class TokenService : ITokenService
 {
-    private readonly string _secretKey = "123456789012345678901234567890123";
+    private readonly JwtSettings _jwtSettings;
+
+    public TokenService(IOptions<JwtSettings> jwtSettings)
+    {
+        _jwtSettings = jwtSettings.Value;
+    }
 
     /// <summary>
     /// Gera um token JWT.
@@ -44,14 +50,23 @@ public class TokenService : ITokenService
         if (permissao.PodeAlterar) claims.Add(new Claim("permissao", "alterar"));
         if (permissao.PodeDeletar) claims.Add(new Claim("permissao", "deletar"));
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
+            issuer:_jwtSettings.Issuer,
+            audience:_jwtSettings.Audience,
             claims: claims,
             expires: DateTime.Now.AddMinutes(10),
             signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+}
+
+public class JwtSettings
+{
+    public string Issuer { get; set; }
+    public string Audience { get; set; }
+    public string Key { get; set; }
 }
