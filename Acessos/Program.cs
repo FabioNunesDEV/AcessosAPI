@@ -4,42 +4,27 @@ using System;
 using Acessos.Data;
 using Microsoft.EntityFrameworkCore;
 using Acessos.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
+using Acessos.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers().AddNewtonsoftJson(); 
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 // Add Automapper a aplicação
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Add classes de seriços
+// Add classes de serviços
 builder.Services.AddScoped<CircularesService>();
 builder.Services.AddScoped<UsuariosService>();
 builder.Services.AddScoped<GruposService>();
 builder.Services.AddScoped<AuthService>();
 
-// Configurar autenticação JWT
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("123456789012345678901234567890123")),
-        ValidateAudience = false,
-        ValidateIssuer = false,
-        ClockSkew = TimeSpan.Zero
-    };
-});
+// Add TokenService sem necessidade de passar a chave secreta
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+// Configurar autenticação JWT através do AuthService
+// var serviceProvider = builder.Services.BuildServiceProvider();
 
 // Definido conexão com o banco de dados
 var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
