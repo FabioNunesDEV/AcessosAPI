@@ -8,7 +8,7 @@ namespace Acessos.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController:ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly AuthService _authService;
 
@@ -23,8 +23,7 @@ public class AuthController:ControllerBase
         return Requisicao.Manipulador(() =>
         {
             var token = _authService.ObterToken(dto);
-            return Ok(token);
+            return new JsonResult(new { sucesso = true, token });
         });
     }
-
 }

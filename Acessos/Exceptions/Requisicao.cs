@@ -27,15 +27,21 @@ namespace Acessos.Exceptions
             }
             catch (ArgumentException ex)
             {
-                return new BadRequestObjectResult(ex.Message);
+                return new JsonResult(new { sucesso = false, mensagem = ex.Message })
+                {
+                    StatusCode = 400
+                };
             }
             catch (KeyNotFoundException ex)
             {
-                return new NotFoundObjectResult(ex.Message);
+                return new JsonResult(new { sucesso = false, mensagem = ex.Message })
+                {
+                    StatusCode = 404
+                };
             }
             catch (Exception ex)
             {
-                return new ObjectResult($"Ocorreu um erro interno no servidor.\n{ex}")
+                return new JsonResult(new { sucesso = false, mensagem = $"Ocorreu um erro interno no servidor.\n{ex.Message}" })
                 {
                     StatusCode = 500
                 };

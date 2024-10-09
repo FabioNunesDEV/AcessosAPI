@@ -39,7 +39,7 @@ public class AuthService
         var usuario = _context.Usuarios.FirstOrDefault(u => u.Login == dto.Login);
         if (usuario == null)
         {
-            return "Usuário não encontrado.";
+            throw new KeyNotFoundException("Login ou senha incorretos.");
         }
 
         string senhaAuth = Util.GerarHash(dto.Senha + "-" + usuario.Salt);
@@ -47,7 +47,7 @@ public class AuthService
         // Verificar a senha do usuário
         if (usuario.Senha != senhaAuth)
         {
-            return "Login ou senha incorretos.";
+            throw new KeyNotFoundException ("Login ou senha incorretos.");
         }
 
         // Obter lista de IDs de grupos aos quais o usuário pertence
