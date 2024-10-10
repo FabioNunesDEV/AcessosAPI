@@ -6,6 +6,7 @@ using Acessos.Data;
 using System.Net;
 using Acessos.Services;
 using Acessos.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Acessos.Controllers
 {
@@ -35,6 +36,7 @@ namespace Acessos.Controllers
         /// <response code="400">O objeto DTO fornecido é inválido.</response>
         [HttpPost]
         [ProducesResponseType(typeof(Circular), (int)HttpStatusCode.Created)]
+        [Authorize(Policy = "CriarPolicy")]
         public IActionResult PostCircular([FromBody] CircularCreateDTO circularDTO)
         {
             return Requisicao.Manipulador(() =>
@@ -54,6 +56,7 @@ namespace Acessos.Controllers
         /// </returns>
         /// <response code="200">Lista de circulares retornada com sucesso.</response>
         [HttpGet]
+        [Authorize(Policy = "LerPolicy")]
         public IActionResult GetCircularLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
         {
             return Requisicao.Manipulador(() =>
@@ -76,9 +79,11 @@ namespace Acessos.Controllers
         /// <response code="404">Circular com o id especificado não foi encontrada.</response>
         /// <response code="400">O id fornecido é inválido.</response>
         [HttpGet("{id}")]
+        [Authorize(Policy = "LerPolicy")]
         public IActionResult GetCircularPorId([FromRoute] int id)
         {
-            return Requisicao.Manipulador(() => {
+            return Requisicao.Manipulador(() =>
+            {
 
                 var circular = _circularesService.ObterCircularPorId(id);
                 return Ok(circular);
@@ -100,6 +105,7 @@ namespace Acessos.Controllers
         /// <response code="404">Circular com o id especificado não foi encontrada.</response>
         /// <response code="400">O id fornecido é inválido.</response>
         [HttpPut("{id}")]
+        [Authorize(Policy = "AlterarPolicy")]
         public IActionResult PutCircular(int id, [FromBody] CircularUpdateDTO circularDTO)
         {
             return Requisicao.Manipulador(() =>
@@ -122,6 +128,7 @@ namespace Acessos.Controllers
         /// <response code="404">Circular com o id especificado não foi encontrada.</response>
         /// <response code="400">O id fornecido é inválido.</response>
         [HttpPut("{id}/Lida")]
+        [Authorize(Policy = "AlterarPolicy")]
         public IActionResult PutCircularLida(int id)
         {
             return Requisicao.Manipulador(() =>
@@ -144,6 +151,7 @@ namespace Acessos.Controllers
         /// <response code="404">Circular com o id especificado não foi encontrada.</response>
         /// <response code="400">O id fornecido é inválido.</response>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "DeletarPolicy")]
         public IActionResult DeleteCircular([FromRoute] int id)
         {
             return Requisicao.Manipulador(() =>

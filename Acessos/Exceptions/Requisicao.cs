@@ -32,6 +32,13 @@ namespace Acessos.Exceptions
                     StatusCode = 400
                 };
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                return new JsonResult(new { sucesso = false, mensagem = ex.Message })
+                {
+                    StatusCode = 401
+                };
+            }
             catch (KeyNotFoundException ex)
             {
                 return new JsonResult(new { sucesso = false, mensagem = ex.Message })
