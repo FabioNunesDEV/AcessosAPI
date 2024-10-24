@@ -3,6 +3,7 @@ using Acessos.DTO.Grupo;
 using Acessos.Exceptions;
 using Acessos.Models;
 using Acessos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -26,6 +27,7 @@ public class GruposController : ControllerBase
     /// <param name="grupoDTO">Objeto DTO com informações do grupo</param>
     [HttpPost]
     [ProducesResponseType(typeof(Grupo), (int)HttpStatusCode.Created)]
+    [Authorize(Policy = "CriarPolicy")]
     public IActionResult PostGrupo([FromBody] GrupoCreateDTO grupoDTO)
     {
         return Requisicao.Manipulador(() =>
@@ -40,6 +42,7 @@ public class GruposController : ControllerBase
     /// </summary>
     /// <param name="id">Id do grupo</param>
     [HttpGet("{id}")]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetGrupoPorId([FromRoute] int id)
     {
         return Requisicao.Manipulador(() =>
@@ -54,6 +57,7 @@ public class GruposController : ControllerBase
     /// </summary>
     /// <param name="id">Id do grupo</param>
     [HttpGet("{id}/usuarios")]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetGrupoPorIdUsuarios([FromRoute] int id)
     {
         return Requisicao.Manipulador(() =>
@@ -70,6 +74,7 @@ public class GruposController : ControllerBase
     /// <param name="take">Quantos registros serão obtidos a partir da posição inicial</param>
     /// <returns>Retorna lista de grupos</returns>
     [HttpGet]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
         return Requisicao.Manipulador(() =>
@@ -84,6 +89,7 @@ public class GruposController : ControllerBase
     /// </summary>
     /// <param name="id">Id do grupo</param>
     /// <param name="grupoDTO">Objeto DTO do grupo</param>
+    [Authorize(Policy = "AlterarPolicy")]
     [HttpPut("{id}")]
     public IActionResult PutGrupo(int id, [FromBody] GrupoUpdateDTO grupoDTO)
     {
@@ -109,6 +115,7 @@ public class GruposController : ControllerBase
     ///
     /// </remarks>
     [HttpPatch("{id}")]
+    [Authorize(Policy = "AlterarPolicy")]
     public IActionResult PatchGrupo(int id, [FromBody] JsonPatchDocument<GrupoUpdateDTO> patchDoc)
     {
         return Requisicao.Manipulador(() =>
@@ -123,6 +130,7 @@ public class GruposController : ControllerBase
     /// </summary>
     /// <param name="id">Id do grupo</param>
     [HttpDelete("{id}")]
+    [Authorize(Policy = "DeletarPolicy")]
     public IActionResult DeleteGrupo(int id)
     {
         return Requisicao.Manipulador(() =>

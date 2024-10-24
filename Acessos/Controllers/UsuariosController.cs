@@ -2,6 +2,7 @@
 using Acessos.Exceptions;
 using Acessos.Models;
 using Acessos.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -24,7 +25,9 @@ public class UsuariosController : ControllerBase
     /// </summary>
     /// <param name="usuarioDTO">Objeto DTO com informações do usuário</param>
     [HttpPost]
+    //[Authorize(Policy = "CriarPolicy")]
     [ProducesResponseType(typeof(Usuario), (int)HttpStatusCode.Created)]
+
     public IActionResult PostUsuario([FromBody] UsuarioCreateDTO usuarioDTO)
     {
         return Requisicao.Manipulador(() =>
@@ -39,6 +42,7 @@ public class UsuariosController : ControllerBase
     /// </summary>
     /// <param name="id">Id do usuário.</param>
     [HttpGet("{id}")]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetUsuarioPorId([FromRoute] int id)
     {
         return Requisicao.Manipulador(() =>
@@ -53,6 +57,7 @@ public class UsuariosController : ControllerBase
     /// </summary>
     /// <param name="id">Id do usuário.</param>
     [HttpGet("{id}/grupo")]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetUsuarioPorIdGrupos([FromRoute] int id)
     {
         return Requisicao.Manipulador(() =>
@@ -67,6 +72,7 @@ public class UsuariosController : ControllerBase
     /// </summary>
     /// <param name="login">Login do usuário.</param>
     [HttpGet("login/{login}")]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetUsuarioPorLogin([FromRoute] string login)
     {
         return Requisicao.Manipulador(() =>
@@ -83,6 +89,7 @@ public class UsuariosController : ControllerBase
     /// <param name="take">Quantos registros serão obtidos a partir da posição inicial</param>
     /// <returns>Retorna lista de usuários</returns>
     [HttpGet]
+    [Authorize(Policy = "LerPolicy")]
     public IActionResult GetLista([FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
         return Requisicao.Manipulador(() =>
@@ -98,6 +105,7 @@ public class UsuariosController : ControllerBase
     /// <param name="id">Id do usuário</param>
     /// <param name="usuarioDTO">Objeto DTO do usuario</param>
     [HttpPut("{id}")]
+    [Authorize(Policy = "AlterarPolicy")]
     public IActionResult PutUsuario(int id, [FromBody] UsuarioUpdateDTO usuarioDTO)
     {
         return Requisicao.Manipulador(() =>
@@ -123,6 +131,7 @@ public class UsuariosController : ControllerBase
     ///
     /// </remarks>
     [HttpPatch("{id}")]
+    [Authorize(Policy = "AlterarPolicy")]
     public IActionResult PatchUsuario(int id, [FromBody] JsonPatchDocument<UsuarioUpdateDTO> patchDoc)
     {
         return Requisicao.Manipulador(() =>
@@ -137,6 +146,7 @@ public class UsuariosController : ControllerBase
     /// </summary>
     /// <param name="id">Id do usuário</param>
     [HttpDelete("{id}")]
+    [Authorize(Policy = "DeletarPolicy")]
     public IActionResult DeleteUsuario(int id)
     {
         return Requisicao.Manipulador(() =>
@@ -152,6 +162,7 @@ public class UsuariosController : ControllerBase
     /// <param name="usuarioId">Id do usuário</param>
     /// <param name="grupoId">Id do grupo</param>
     [HttpPost("{usuarioId}/grupos/{grupoId}")]
+    //[Authorize(Policy = "CriarPolicy")]
     public IActionResult PostUsuarioGrupo([FromRoute] int usuarioId, [FromRoute] int grupoId)
     {
         return Requisicao.Manipulador(() =>
@@ -167,6 +178,7 @@ public class UsuariosController : ControllerBase
     /// <param name="usuarioId">Id do usuário</param>
     /// <param name="grupoId">Id do grupo</param>
     [HttpDelete("{usuarioId}/grupos/{grupoId}")]
+    [Authorize(Policy = "DeletarPolicy")]
     public IActionResult DeleteUsuarioGrupo([FromRoute] int usuarioId, [FromRoute] int grupoId)
     {
         return Requisicao.Manipulador(() =>
