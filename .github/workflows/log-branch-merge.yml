@@ -27,7 +27,7 @@ jobs:
         echo "Merge Commit SHA: ${{ github.event.pull_request.merge_commit_sha }}"
         echo "PR merged: ${{ github.event.pull_request.merged }}"
 
-    # Usar o SHA de merge diretamente do evento do PR
+    # Usar o SHA de merge diretamente do evento do PR e comparar com a branch anterior
     - name: Get the list of changed files
       run: |
         MERGE_COMMIT="${{ github.event.pull_request.merge_commit_sha }}"
@@ -35,8 +35,8 @@ jobs:
           echo "Merge commit SHA not found, exiting..."
           exit 1
         fi
-        # Obter a lista de arquivos alterados no commit de merge
-        FILES=$(git diff-tree --no-commit-id --name-only -r $MERGE_COMMIT)
+        # Obter a lista de arquivos alterados comparando o commit de merge com o commit anterior
+        FILES=$(git diff --name-only $MERGE_COMMIT~1 $MERGE_COMMIT)
         if [ -z "$FILES" ]; then
           echo "No files changed found."
           exit 1
