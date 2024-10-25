@@ -11,39 +11,60 @@ jobs:
   log_merge:
     runs-on: ubuntu-latest
 
+    if: github.event.pull_request.merged == true
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Get the last merge commit
+    # Depurar informações do evento de pull request
+    - name: Print PR info
       run: |
-        # Obtém o hash do commit do merge
-        MERGE_COMMIT=$(git log -n 1 --merges --pretty=format:"%H")
-        echo "Merge Commit: $MERGE_COMMIT"
+        echo "Pull Request Number: ${{ github.event.pull_request.number }}"
+        echo "Pull Request Title: ${{ github.event.pull_request.title }}"
+        echo "Merged Branch: ${{ github.event.pull_request.head.ref }}"
+        echo "Base Branch (Target): ${{ github.event.pull_request.base.ref }}"
+        echo "Merge Commit SHA: ${{ github.event.pull_request.merge_commit_sha }}"
+        echo "PR merged: ${{ github.event.pull_request.merged }}"
 
-        # Obtém a branch que foi mesclada
-        MERGED_BRANCH=$(git log -n 1 --merges --pretty=format:"%P" | awk '{print $2}')
-        echo "Merged Branch: $MERGED_BRANCH"
-        echo "MERGED_BRANCH=$MERGED_BRANCH" >> $GITHUB_ENV
-
+    # Usar o SHA de merge diretamente do evento do PR
     - name: Get the list of changed files
       run: |
-        # Obtém a lista de arquivos alterados
+        MERGE_COMMIT="${{ github.event.pull_request.merge_commit_sha }}"
+        if [ -z "$MERGE_COMMIT" ]; then
+          echo "Merge commit SHA not found, exiting..."
+          exit 1
+        fi
+        # Obter a lista de arquivos alterados no commit de merge
         FILES=$(git diff-tree --no-commit-id --name-only -r $MERGE_COMMIT)
+        if [ -z "$FILES" ]; then
+          echo "No files changed found."
+          exit 1
+        fi
         echo "Files changed: $FILES"
         echo "CHANGED_FILES=$FILES" >> $GITHUB_ENV
 
+    # Verificar a criação do arquivo e atualizar o log
     - name: Update log file
       run: |
-        # Formata a entrada para o log
-        echo "Branch merged: $MERGED_BRANCH" >> merged_log.txt
+        echo "Verifying file creation..."
+        touch merged_log.txt
+        ls -l merged_log.txt
+
+        # Formatar a entrada para o log
+        echo "Branch merged: ${{ github.event.pull_request.head.ref }}" >> merged_log.txt
         echo "Files changed:" >> merged_log.txt
         echo "$CHANGED_FILES" >> merged_log.txt
         echo "---" >> merged_log.txt
 
-        # Adiciona, commita e envia o arquivo atualizado ao repositório
+        # Adicionar, commitar e enviar o arquivo atualizado ao repositório
         git config --global user.name "github-actions"
         git config --global user.email "actions@github.com"
         git add merged_log.txt
-        git commit -m "Update merged log with branch $MERGED_BRANCH"
+        git commit -m "Update merged log with branch ${{ github.event.pull_request.head.ref }}"
         git push
+
+    # Verificar as credenciais para push
+    - name: Verify GitHub credentials
+      run: |
+        git remote -v
