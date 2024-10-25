@@ -11,10 +11,7 @@ using System.Text;
 using Acessos.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-
-/*
- * outro comentario novo 2
- */
+// Nova linha de comentário
 
 var builder = WebApplication.CreateBuilder(args);
 
