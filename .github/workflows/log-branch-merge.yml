@@ -36,14 +36,26 @@ jobs:
 
         # Obter a branch que foi mesclada
         MERGED_BRANCH=$(git log -n 1 --merges --pretty=format:"%P" | awk '{print $2}')
+        if [ -z "$MERGED_BRANCH" ]; then
+          echo "No merged branch found, exiting..."
+          exit 1
+        fi
         echo "Merged Branch: $MERGED_BRANCH"
         echo "MERGED_BRANCH=$MERGED_BRANCH" >> $GITHUB_ENV
 
     # Obter a lista de arquivos alterados
     - name: Get the list of changed files
       run: |
+        if [ -z "$MERGE_COMMIT" ]; then
+          echo "Merge commit not found, skipping diff."
+          exit 1
+        fi
         # Obter a lista de arquivos alterados no commit de merge
         FILES=$(git diff-tree --no-commit-id --name-only -r $MERGE_COMMIT)
+        if [ -z "$FILES" ]; then
+          echo "No files changed found."
+          exit 1
+        fi
         echo "Files changed: $FILES"
         echo "CHANGED_FILES=$FILES" >> $GITHUB_ENV
 
