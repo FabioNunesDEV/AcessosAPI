@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 
 /*
- * Programa feito para teste github actions
+ * Programa feito para teste github actions, outro teste
  */
 
 var builder = WebApplication.CreateBuilder(args);
