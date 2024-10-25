@@ -17,37 +17,22 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # Verificar o histórico de commits para depuração
-    - name: Debug Git log
+    # Depurar informações do evento de pull request
+    - name: Print PR info
       run: |
-        echo "Checking commit history..."
-        git log --oneline --graph --all
+        echo "Pull Request Number: ${{ github.event.pull_request.number }}"
+        echo "Pull Request Title: ${{ github.event.pull_request.title }}"
+        echo "Merged Branch: ${{ github.event.pull_request.head.ref }}"
+        echo "Base Branch (Target): ${{ github.event.pull_request.base.ref }}"
+        echo "Merge Commit SHA: ${{ github.event.pull_request.merge_commit_sha }}"
+        echo "PR merged: ${{ github.event.pull_request.merged }}"
 
-    # Obter o último commit de merge
-    - name: Get the last merge commit
-      run: |
-        # Obter o hash do commit do merge ou indicar se não houver merge
-        MERGE_COMMIT=$(git log -n 1 --merges --pretty=format:"%H" || echo "no merge found")
-        if [ "$MERGE_COMMIT" = "no merge found" ]; then
-          echo "No merge commit found, exiting..."
-          exit 1
-        fi
-        echo "Merge Commit: $MERGE_COMMIT"
-
-        # Obter a branch que foi mesclada
-        MERGED_BRANCH=$(git log -n 1 --merges --pretty=format:"%P" | awk '{print $2}')
-        if [ -z "$MERGED_BRANCH" ]; then
-          echo "No merged branch found, exiting..."
-          exit 1
-        fi
-        echo "Merged Branch: $MERGED_BRANCH"
-        echo "MERGED_BRANCH=$MERGED_BRANCH" >> $GITHUB_ENV
-
-    # Obter a lista de arquivos alterados
+    # Usar o SHA de merge diretamente do evento do PR
     - name: Get the list of changed files
       run: |
+        MERGE_COMMIT="${{ github.event.pull_request.merge_commit_sha }}"
         if [ -z "$MERGE_COMMIT" ]; then
-          echo "Merge commit not found, skipping diff."
+          echo "Merge commit SHA not found, exiting..."
           exit 1
         fi
         # Obter a lista de arquivos alterados no commit de merge
@@ -67,7 +52,7 @@ jobs:
         ls -l merged_log.txt
 
         # Formatar a entrada para o log
-        echo "Branch merged: $MERGED_BRANCH" >> merged_log.txt
+        echo "Branch merged: ${{ github.event.pull_request.head.ref }}" >> merged_log.txt
         echo "Files changed:" >> merged_log.txt
         echo "$CHANGED_FILES" >> merged_log.txt
         echo "---" >> merged_log.txt
@@ -76,7 +61,7 @@ jobs:
         git config --global user.name "github-actions"
         git config --global user.email "actions@github.com"
         git add merged_log.txt
-        git commit -m "Update merged log with branch $MERGED_BRANCH"
+        git commit -m "Update merged log with branch ${{ github.event.pull_request.head.ref }}"
         git push
 
     # Verificar as credenciais para push
