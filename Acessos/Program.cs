@@ -11,7 +11,7 @@ using System.Text;
 using Acessos.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
-// Nova linha de comentário
+// nova alteração pullrequest
 
 var builder = WebApplication.CreateBuilder(args);
 
