@@ -1,0 +1,47 @@
+name: Log Branch Merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  log_merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Get the last merge commit
+      run: |
+        # Obtém o hash do commit do merge
+        MERGE_COMMIT=$(git log -n 1 --merges --pretty=format:"%H")
+        echo "Merge Commit: $MERGE_COMMIT"
+
+        # Obtém a branch que foi mesclada
+        MERGED_BRANCH=$(git log -n 1 --merges --pretty=format:"%P" | awk '{print $2}')
+        echo "Merged Branch: $MERGED_BRANCH"
+        echo "MERGED_BRANCH=$MERGED_BRANCH" >> $GITHUB_ENV
+
+    - name: Get the list of changed files
+      run: |
+        # Obtém a lista de arquivos alterados
+        FILES=$(git diff-tree --no-commit-id --name-only -r $MERGE_COMMIT)
+        echo "Files changed: $FILES"
+        echo "CHANGED_FILES=$FILES" >> $GITHUB_ENV
+
+    - name: Update log file
+      run: |
+        # Formata a entrada para o log
+        echo "Branch merged: $MERGED_BRANCH" >> merged_log.txt
+        echo "Files changed:" >> merged_log.txt
+        echo "$CHANGED_FILES" >> merged_log.txt
+        echo "---" >> merged_log.txt
+
+        # Adiciona, commita e envia o arquivo atualizado ao repositório
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+        git add merged_log.txt
+        git commit -m "Update merged log with branch $MERGED_BRANCH"
+        git push
