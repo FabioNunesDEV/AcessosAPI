@@ -1,9 +1,11 @@
 name: Log Branch Merge
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types:
+      - closed
 
 jobs:
   log_merge:
