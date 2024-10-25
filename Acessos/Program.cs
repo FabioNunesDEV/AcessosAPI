@@ -21,23 +21,23 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson();
 
-// Add Automapper a aplicação
+// Add Automapper a aplicaÃ§Ã£o
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Add classes de serviços
+// Add classes de serviÃ§os
 builder.Services.AddScoped<CircularesService>();
 builder.Services.AddScoped<UsuariosService>();
 builder.Services.AddScoped<GruposService>();
 builder.Services.AddScoped<AuthService>();
 
-// Carregar configurações do JWT do appsettings.json
+// Carregar configuraÃ§Ãµes do JWT do appsettings.json
 var jwtSettingsSection = builder.Configuration.GetSection("Jwt");
 builder.Services.Configure<JwtSettings>(jwtSettingsSection);
 
 // Add TokenService 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-// Definido conexão com o banco de dados
+// Definido conexÃ£o com o banco de dados
 var connectionString = builder.Configuration.GetConnectionString("AcessoAPIConnection");
 builder.Services.AddDbContext<AcessoApiContext>(opts => opts.UseSqlServer(connectionString));
 
@@ -51,7 +51,7 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
-// Configurar autenticação JWT
+// Configurar autenticaÃ§Ã£o JWT
 var jwtSettings = jwtSettingsSection.Get<JwtSettings>();
 var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
 
@@ -76,7 +76,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configurar autorização
+// Configurar autorizaÃ§Ã£o
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("CriarPolicy", policy => policy.Requirements.Add(new CriarRequirement()));
@@ -85,7 +85,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("DeletarPolicy", policy => policy.Requirements.Add(new DeletarRequirement()));
 });
 
-// Registrar o manipulador de autorização
+// Registrar o manipulador de autorizaÃ§Ã£o
 builder.Services.AddSingleton<IAuthorizationHandler, CriarHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, LerHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, AlterarHandler>();
