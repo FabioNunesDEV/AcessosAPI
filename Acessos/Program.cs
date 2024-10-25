@@ -11,6 +11,11 @@ using System.Text;
 using Acessos.Authorization;
 using Microsoft.AspNetCore.Authorization;
 
+
+/*
+ * Programa feito para teste github actions
+ */
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
